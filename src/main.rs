@@ -26,13 +26,13 @@ trait Intersectable {
     fn intersection(&self, ray: &Ray) -> Option<f32>;
 }
 
-struct Intersection<T: Intersectable> {
+struct Intersection<'a, T: Intersectable> {
     distance: f32,
-    object: Box<T>,
+    object: &'a T,
 }
 
-impl<T:Intersectable> Intersection<T> {
-    fn new(distance: f32, object: Box<T>) -> Intersection<T> {
+impl<'a, T:Intersectable> Intersection<'a, T> {
+    fn new(distance: f32, object: &'a T) -> Intersection<T> {
         Intersection {
             distance,
             object
@@ -74,18 +74,18 @@ impl Intersectable for Triangle {
     }
 }
 
-struct Scene<T: Intersectable> {
-    objects: Vec<Box<T>>,
+struct Scene<'a, T: Intersectable> {
+    objects: Vec<&'a T>,
 }
 
-impl<T> Scene<T> where T: Intersectable {
+impl<'a, T> Scene<'a, T> where T: Intersectable {
     fn closest_intersection(&self, ray: &Ray) -> Option<Intersection<T>> {
         let mut closest_dist = f32::MAX;
         let mut closest_isec: Option<Intersection<T>> = None;
-        for object in self.objects.iter() {
+        for object in self.objects {
             match object.intersection(ray) {
-                Some(distance) => if distance < closest_dist {closest_isec = Some(Intersection {distance, object: Box::new(**object)}); closest_dist = distance},
-                _ => ()
+                Some(distance) => if distance < closest_dist {closest_isec = Some(Intersection {distance, object}); closest_dist = distance},
+                None => {}
             };
         }
         return closest_isec;
@@ -98,10 +98,10 @@ impl<T> Scene<T> where T: Intersectable {
 fn main() {
     println!("Hello, world!");
     let p1 = Point {x:5.0, y:5.0, z:5.0};
-    let sphere1 = Box::new(Sphere {centre: p1, radius:2.0});
-    let triangle1 = Box::new(Triangle {v0: p1, v1: p1, v2: p1, normal: p1});
-    let objects: Vec<Box<dyn Intersectable>> = vec![sphere1, triangle1];
-    // let scene = Scene {
-    //     objects: objects
-    // };
+    let sphere1 = &Sphere {centre: p1, radius:2.0};
+    let triangle1 = &Triangle {v0: p1, v1: p1, v2: p1, normal: p1};
+    let objects: Vec<&dyn Intersectable> = vec![sphere1, triangle1];
+    let scene: Scene<dyn Intersectable> = Scene {
+        objects: objects
+    };
 }
