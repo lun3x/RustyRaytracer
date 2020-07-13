@@ -5,6 +5,11 @@ type Colour = cgmath::Vector3<u8>;
 type Point = cgmath::Vector3<f32>;
 type Vector = cgmath::Vector3<f32>;
 
+enum Object {
+    Triangle(Triangle),
+    Sphere(Sphere),
+}
+
 struct Triangle {
     pub v0: Point,
     pub v1: Point,
@@ -26,13 +31,22 @@ trait Intersectable {
     fn intersection(&self, ray: &Ray) -> Option<f32>;
 }
 
-struct Intersection<'a, T: Intersectable> {
-    distance: f32,
-    object: &'a T,
+impl Intersectable for Object {
+    fn intersection(&self, ray: &Ray) -> Option<f32> {
+        match *self {
+            Object::Sphere(ref s) => s.intersection(ray),
+            Object::Triangle(ref t) => t.intersection(ray),
+        }
+    }
 }
 
-impl<'a, T:Intersectable> Intersection<'a, T> {
-    fn new(distance: f32, object: &'a T) -> Intersection<T> {
+struct Intersection<'a> {
+    distance: f32,
+    object: &'a Object,
+}
+
+impl<'a> Intersection<'a> {
+    fn new(distance: f32, object: &'a Object) -> Intersection {
         Intersection {
             distance,
             object
@@ -74,34 +88,40 @@ impl Intersectable for Triangle {
     }
 }
 
-struct Scene<'a, T: Intersectable> {
-    objects: Vec<&'a T>,
+struct Scene {
+    objects: Vec<Object>,
 }
 
-impl<'a, T> Scene<'a, T> where T: Intersectable {
-    fn closest_intersection(&self, ray: &Ray) -> Option<Intersection<T>> {
+impl Scene {
+    fn closest_intersection(&self, ray: &Ray) -> Option<Intersection> {
         let mut closest_dist = f32::MAX;
-        let mut closest_isec: Option<Intersection<T>> = None;
-        for object in self.objects {
+        let mut closest_isec: Option<Intersection> = None;
+        for object in self.objects.iter() {
             match object.intersection(ray) {
-                Some(distance) => if distance < closest_dist {closest_isec = Some(Intersection {distance, object}); closest_dist = distance},
-                None => {}
-            };
+                Some(distance) => if distance < closest_dist {
+                    closest_isec = Some(Intersection::new(distance, object));
+                    closest_dist = distance;
+                },
+                _ => ()
+            }
         }
         return closest_isec;
-        // self.objects.iter()
-        //             .filter_map(|o| o.intersection(ray).map(|i| Intersection{distance:i.distance2(ray.start), object:o} ))
-        //             .min_by(|i1, i2| i1.distance.partial_cmp(&i2.distance).unwrap())
     }
 }
 
 fn main() {
     println!("Hello, world!");
+    let p0 = Point {x:0.0, y:0.0, z:0.0};
     let p1 = Point {x:5.0, y:5.0, z:5.0};
-    let sphere1 = &Sphere {centre: p1, radius:2.0};
-    let triangle1 = &Triangle {v0: p1, v1: p1, v2: p1, normal: p1};
-    let objects: Vec<&dyn Intersectable> = vec![sphere1, triangle1];
-    let scene: Scene<dyn Intersectable> = Scene {
+    let sphere1 = Object::Sphere(Sphere {centre: p1, radius:2.0});
+    let triangle1 = Object::Triangle(Triangle {v0: p1, v1: p1, v2: p1, normal: p1});
+    let objects: Vec<Object> = vec![sphere1, triangle1];
+    let scene = Scene {
         objects: objects
     };
+    let ray = Ray {start: p0, dir: Vector{x:1.0, y:1.0, z:1.0}};
+    match scene.closest_intersection(&ray) {
+        Some(i) => println!("{}m away", i.distance),
+        _ => ()
+    }
 }
