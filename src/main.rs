@@ -80,14 +80,15 @@ struct Scene<T: Intersectable> {
 
 impl<T> Scene<T> where T: Intersectable {
     fn closest_intersection(&self, ray: &Ray) -> Option<Intersection<T>> {
-        let mut closest = Intersection {distance:f32::MAX, object: Box::new(Sphere{centre: Point::new(0.0, 0.0, 0.0), radius: 1.0} as dyn Intersectable)};
+        let mut closest_dist = f32::MAX;
+        let mut closest_isec: Option<Intersection<T>> = None;
         for object in self.objects.iter() {
             match object.intersection(ray) {
-                Some(distance) => if distance < closest.distance {closest = Intersection {distance, object: object}},
+                Some(distance) => if distance < closest_dist {closest_isec = Some(Intersection {distance, object: Box::new(**object)}); closest_dist = distance},
                 _ => ()
             };
         }
-        return Some(closest);
+        return closest_isec;
         // self.objects.iter()
         //             .filter_map(|o| o.intersection(ray).map(|i| Intersection{distance:i.distance2(ray.start), object:o} ))
         //             .min_by(|i1, i2| i1.distance.partial_cmp(&i2.distance).unwrap())
@@ -97,9 +98,9 @@ impl<T> Scene<T> where T: Intersectable {
 fn main() {
     println!("Hello, world!");
     let p1 = Point {x:5.0, y:5.0, z:5.0};
-    let sphere1 = &Sphere {centre: p1, radius:2.0};
-    let triangle1 = &Triangle {v0: p1, v1: p1, v2: p1, normal: p1};
-    let objects = vec![sphere1, triangle1];
+    let sphere1 = Box::new(Sphere {centre: p1, radius:2.0});
+    let triangle1 = Box::new(Triangle {v0: p1, v1: p1, v2: p1, normal: p1});
+    let objects: Vec<Box<dyn Intersectable>> = vec![sphere1, triangle1];
     // let scene = Scene {
     //     objects: objects
     // };
