@@ -1,7 +1,7 @@
-use image::RgbImage;
+use image::{Rgb, RgbImage};
 use cgmath::prelude::*;
 
-pub type Colour = cgmath::Vector3<u8>;
+pub type Colour = [u8;3];
 pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
 
@@ -43,5 +43,13 @@ impl Visualiser {
             }
             .normalize()
         }
+    }
+
+    pub fn put_pixel(&mut self, x: u32, y: u32, colour: Colour) {
+        self.screen.put_pixel(x, y, Rgb(colour));
+    }
+
+    pub fn save(&self) {
+        self.screen.save("./render.png");
     }
 }
