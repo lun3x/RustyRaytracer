@@ -1,6 +1,6 @@
-use cgmath::prelude::*;
 use crate::objects::*;
 use crate::visualiser::*;
+use cgmath::prelude::*;
 
 const EPSILON: f32 = 0.000005;
 
@@ -32,10 +32,7 @@ pub struct Intersection<'a> {
 
 impl<'a> Intersection<'a> {
     pub fn new(location: IntersectionLocation, object: &'a Object) -> Self {
-        Intersection {
-            location,
-            object,
-        }
+        Intersection { location, object }
     }
 }
 
@@ -70,12 +67,12 @@ impl Intersectable for Sphere {
         // Intersection distances
         let isect0 = adjacent - half_chord;
         let isect1 = adjacent + half_chord;
-        
+
         // Dont return intersections behind camera
         if isect0.is_sign_negative() && isect1.is_sign_negative() {
             return None;
         }
-        
+
         let loc = IntersectionLocation {
             distance: if isect0 < isect1 { isect0 } else { isect1 },
             texture_coords: BarycentricCoords::new(0.0, 0.0),
@@ -96,20 +93,20 @@ impl Intersectable for Triangle {
         let determinant: f32 = v0v1.dot(pvec);
 
         // cull backfacing triangles
-        if determinant < EPSILON { 
-            return None; 
+        if determinant < EPSILON {
+            return None;
         }
         // avoid parallel rays
-        if determinant.abs() < EPSILON { 
-            return None; 
+        if determinant.abs() < EPSILON {
+            return None;
         }
 
         // compute 'u' barycentric coord
         let inv_det: f32 = 1.0 / determinant;
         let tvec: Vector = ray.start - self.v0;
         let u: f32 = tvec.dot(pvec) * inv_det;
-        if u < 0.0 || u > 1.0 { 
-            return None; 
+        if u < 0.0 || u > 1.0 {
+            return None;
         }
 
         // compute 'v' barycentric coord

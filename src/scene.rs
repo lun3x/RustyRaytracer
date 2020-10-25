@@ -1,5 +1,5 @@
-use crate::objects::*;
 use crate::intersect::*;
+use crate::objects::*;
 use crate::visualiser::*;
 
 pub struct Scene {
@@ -12,11 +12,13 @@ impl Scene {
         let mut closest_isect: Option<Intersection> = None;
         for object in self.objects.iter() {
             match object.intersection(ray) {
-                Some(location) => if location.distance < closest_dist {
-                    closest_dist = location.distance;
-                    closest_isect = Some(Intersection::new(location, object));
-                },
-                _ => ()
+                Some(location) => {
+                    if location.distance < closest_dist {
+                        closest_dist = location.distance;
+                        closest_isect = Some(Intersection::new(location, object));
+                    }
+                }
+                _ => (),
             }
         }
         closest_isect

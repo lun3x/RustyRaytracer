@@ -1,7 +1,7 @@
-use image::{Rgb, RgbImage};
 use cgmath::prelude::*;
+use image::{Rgb, RgbImage};
 
-pub type Colour = [u8;3];
+pub type Colour = [u8; 3];
 pub type ColourFloat = cgmath::Vector3<f32>;
 pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
@@ -42,7 +42,7 @@ impl Visualiser {
                 y: y_screen,
                 z: -1.0,
             }
-            .normalize()
+            .normalize(),
         }
     }
 
