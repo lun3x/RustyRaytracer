@@ -2,6 +2,11 @@ use crate::intersect::*;
 use crate::visualiser::*;
 use cgmath::prelude::*;
 
+pub enum Material {
+    Specular,
+    Diffuse,
+}
+
 pub enum Object {
     Triangle(Triangle),
     Sphere(Sphere),
@@ -12,16 +17,18 @@ pub struct Triangle {
     pub v1: Point,
     pub v2: Point,
     pub colours: [Colour; 3],
+    pub material: Material,
     normal: Vector,
 }
 
 impl Triangle {
-    pub fn new(v0: Point, v1: Point, v2: Point, colours: [Colour; 3]) -> Self {
+    pub fn new(v0: Point, v1: Point, v2: Point, colours: [Colour; 3], material: Material) -> Self {
         Triangle {
             v0,
             v1,
             v2,
             colours,
+            material,
             normal: compute_normal(v0, v1, v2),
         }
     }
@@ -37,6 +44,7 @@ pub struct Sphere {
     pub centre: Point,
     pub radius: f32,
     pub colour: Colour,
+    pub material: Material,
 }
 
 pub trait Coloured {
@@ -62,7 +70,7 @@ impl Coloured for Triangle {
 }
 
 impl Coloured for Sphere {
-    fn get_colour(&self, texture_coords: BarycentricCoords) -> Colour {
+    fn get_colour(&self, _texture_coords: BarycentricCoords) -> Colour {
         self.colour
     }
 }
@@ -74,5 +82,43 @@ impl Coloured for Object {
             Triangle(ref t) => t.get_colour(texture_coords),
             Sphere(ref s) => s.get_colour(texture_coords),
         }
+    }
+}
+
+impl Object {
+    pub fn get_material(&self) -> &Material {
+        use Object::*;
+        match *self {
+            Triangle(ref t) => t.get_material(),
+            Sphere(ref s) => s.get_material(),
+        }
+    }
+
+    pub fn get_normal(&self, location: Point) -> Vector {
+        use Object::*;
+        match *self {
+            Triangle(ref t) => t.get_normal(location),
+            Sphere(ref s) => s.get_normal(location),
+        }
+    }
+}
+
+impl Sphere {
+    pub fn get_material(&self) -> &Material {
+        &self.material
+    }
+
+    pub fn get_normal(&self, location: Point) -> Vector {
+        (location - self.centre) / self.radius
+    }
+}
+
+impl Triangle {
+    pub fn get_material(&self) -> &Material {
+        &self.material
+    }
+
+    pub fn get_normal(&self, _location: Point) -> Vector {
+        self.normal
     }
 }

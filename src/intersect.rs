@@ -1,4 +1,5 @@
 use crate::objects::*;
+use crate::rays::*;
 use crate::visualiser::*;
 use cgmath::prelude::*;
 

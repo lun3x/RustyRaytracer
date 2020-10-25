@@ -1,3 +1,4 @@
+use crate::rays::*;
 use cgmath::prelude::*;
 use image::{Rgb, RgbImage};
 
@@ -5,11 +6,6 @@ pub type Colour = [u8; 3];
 pub type ColourFloat = cgmath::Vector3<f32>;
 pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
-
-pub struct Ray {
-    pub start: Point,
-    pub dir: Vector,
-}
 
 pub struct Camera {
     pub location: Point,

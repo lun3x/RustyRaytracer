@@ -1,6 +1,6 @@
 use crate::intersect::*;
 use crate::objects::*;
-use crate::visualiser::*;
+use crate::rays::*;
 
 pub struct Scene {
     pub objects: Vec<Object>,
