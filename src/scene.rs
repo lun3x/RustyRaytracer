@@ -9,16 +9,16 @@ pub struct Scene {
 impl Scene {
     pub fn closest_intersection(&self, ray: &Ray) -> Option<Intersection> {
         let mut closest_dist = f32::MAX;
-        let mut closest_isec: Option<Intersection> = None;
+        let mut closest_isect: Option<Intersection> = None;
         for object in self.objects.iter() {
             match object.intersection(ray) {
                 Some(distance) => if distance < closest_dist {
-                    closest_isec = Some(Intersection::new(distance, object));
+                    closest_isect = Some(Intersection::new(distance, object));
                     closest_dist = distance;
                 },
                 _ => ()
             }
         }
-        return closest_isec;
+        closest_isect
     }
 }

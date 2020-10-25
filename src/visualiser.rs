@@ -22,7 +22,7 @@ pub struct Visualiser {
 }
 
 impl Visualiser {
-    pub fn new(height: u32, width: u32, camera: Camera) -> Visualiser {
+    pub fn new(height: u32, width: u32, camera: Camera) -> Self {
         Visualiser {
             screen: RgbImage::new(height, width),
             aspect_ratio: width as f32 / height as f32,
