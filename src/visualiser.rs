@@ -2,6 +2,7 @@ use image::{Rgb, RgbImage};
 use cgmath::prelude::*;
 
 pub type Colour = [u8;3];
+pub type ColourFloat = cgmath::Vector3<f32>;
 pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
 
@@ -24,7 +25,7 @@ pub struct Visualiser {
 impl Visualiser {
     pub fn new(height: u32, width: u32, camera: Camera) -> Self {
         Visualiser {
-            screen: RgbImage::new(height, width),
+            screen: RgbImage::new(width, height),
             aspect_ratio: width as f32 / height as f32,
             camera,
         }
@@ -50,6 +51,10 @@ impl Visualiser {
     }
 
     pub fn save(&self) {
-        self.screen.save("./render.png");
+        let out_file = "render.png";
+        match self.screen.save(out_file) {
+            Ok(_) => println!("Saved {} successfully", out_file),
+            Err(_) => panic!("Problem saving {}!", out_file),
+        }
     }
 }

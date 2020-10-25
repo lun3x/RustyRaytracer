@@ -1,5 +1,6 @@
 use cgmath::prelude::*;
 use crate::visualiser::*;
+use crate::intersect::*;
 
 pub enum Object {
     Triangle(Triangle),
@@ -10,17 +11,17 @@ pub struct Triangle {
     pub v0: Point,
     pub v1: Point,
     pub v2: Point,
-    pub colour: Colour,
+    pub colours: [Colour;3],
     normal: Vector,
 }
 
 impl Triangle {
-    pub fn new(v0: Point, v1: Point, v2: Point, colour: Colour) -> Self {
+    pub fn new(v0: Point, v1: Point, v2: Point, colours: [Colour;3]) -> Self {
         Triangle {
             v0,
             v1,
             v2,
-            colour,
+            colours,
             normal: compute_normal(v0, v1, v2),
         }
     }
@@ -39,27 +40,37 @@ pub struct Sphere {
 }
 
 pub trait Coloured {
-    fn get_colour(&self) -> Colour;
+    fn get_colour(&self, texture_coords: BarycentricCoords) -> Colour;
 }
 
-impl Coloured for Sphere {
-    fn get_colour(&self) -> Colour {
-        self.colour
-    }
+fn as_float(colour: Colour) -> ColourFloat {
+    ColourFloat::new(colour[0] as f32, colour[1] as f32, colour[2] as f32)
+}
+
+fn as_int(colour: ColourFloat) -> Colour {
+    [colour[0] as u8, colour[1] as u8, colour[2] as u8]
 }
 
 impl Coloured for Triangle {
-    fn get_colour(&self) -> Colour {
+    fn get_colour(&self, texture_coords: BarycentricCoords) -> Colour {
+        as_int(texture_coords.u * as_float(self.colours[0]) +
+                       texture_coords.v * as_float(self.colours[1]) +
+                       texture_coords.w * as_float(self.colours[2]))
+    }
+}
+
+impl Coloured for Sphere {
+    fn get_colour(&self, texture_coords: BarycentricCoords) -> Colour {
         self.colour
     }
 }
 
 impl Coloured for Object {
-    fn get_colour(&self) -> Colour {
+    fn get_colour(&self, texture_coords: BarycentricCoords) -> Colour {
         use Object::*;
         match *self {
-            Triangle(ref t) => t.get_colour(),
-            Sphere(ref s) => s.get_colour(),
+            Triangle(ref t) => t.get_colour(texture_coords),
+            Sphere(ref s) => s.get_colour(texture_coords),
         }
     }
 }

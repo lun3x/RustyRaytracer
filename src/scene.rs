@@ -12,9 +12,9 @@ impl Scene {
         let mut closest_isect: Option<Intersection> = None;
         for object in self.objects.iter() {
             match object.intersection(ray) {
-                Some(distance) => if distance < closest_dist {
-                    closest_isect = Some(Intersection::new(distance, object));
-                    closest_dist = distance;
+                Some(location) => if location.distance < closest_dist {
+                    closest_dist = location.distance;
+                    closest_isect = Some(Intersection::new(location, object));
                 },
                 _ => ()
             }
