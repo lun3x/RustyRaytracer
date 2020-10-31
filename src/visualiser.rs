@@ -1,4 +1,5 @@
 use crate::rays::*;
+use crate::utils;
 use cgmath::prelude::*;
 use image::{Rgb, RgbImage};
 
@@ -6,10 +7,28 @@ pub type Colour = [u8; 3];
 pub type ColourFloat = cgmath::Vector3<f32>;
 pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
+pub type RotationMatrix = cgmath::Matrix4<f32>;
+pub type Degrees = cgmath::Deg<f32>;
 
 pub struct Camera {
     pub location: Point,
     pub focal_length: f32,
+    pub yaw: Degrees,
+    pub rotation_matrix: RotationMatrix,
+}
+
+impl Camera {
+    pub fn new(location: Point, focal_length: f32, yaw: f32) -> Self {
+        let yaw = cgmath::Deg(yaw);
+        let rotation_matrix = RotationMatrix::from_angle_y(yaw);
+        let location = utils::four_to_three(rotation_matrix * utils::three_to_four(location));
+        Camera {
+            location,
+            focal_length,
+            yaw,
+            rotation_matrix,
+        }
+    }
 }
 
 pub struct Visualiser {
@@ -32,14 +51,15 @@ impl Visualiser {
         let y_screen = 1.0 - ((y as f32 + 0.5) / self.screen.height() as f32) * 2.0;
 
         Ray {
-            start: Point::zero(),
+            start: self.camera.location,
             dir: Vector {
                 x: x_screen,
                 y: y_screen,
-                z: -1.0,
+                z: -self.camera.focal_length,
             }
             .normalize(),
         }
+        .rotate(self.camera.rotation_matrix)
     }
 
     pub fn put_pixel(&mut self, x: u32, y: u32, colour: Colour) {

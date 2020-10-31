@@ -2,6 +2,7 @@ use crate::intersect::*;
 use crate::visualiser::*;
 use cgmath::prelude::*;
 
+#[derive(Clone, Copy)]
 pub enum Material {
     Specular,
     Diffuse,
@@ -109,7 +110,7 @@ impl Sphere {
     }
 
     pub fn get_normal(&self, location: Point) -> Vector {
-        (location - self.centre) / self.radius
+        ((location - self.centre) / self.radius).normalize()
     }
 }
 

@@ -5,12 +5,15 @@ use crate::visualiser::*;
 const RED: [u8; 3] = [255, 0, 0];
 const GREEN: [u8; 3] = [0, 255, 0];
 const BLUE: [u8; 3] = [0, 0, 255];
+const WHITE: [u8; 3] = [255, 255, 255];
+const PURPLE: [u8; 3] = [255, 0, 255];
 
 pub fn get_scene2() -> Scene {
+    // Vertices
     let p0 = Point {
         x: -10.0,
         y: -10.0,
-        z: 0.0,
+        z: 10.0,
     };
     let p1 = Point {
         x: -10.0,
@@ -20,7 +23,7 @@ pub fn get_scene2() -> Scene {
     let p2 = Point {
         x: 10.0,
         y: -10.0,
-        z: 0.0,
+        z: 10.0,
     };
     let p3 = Point {
         x: 10.0,
@@ -30,7 +33,7 @@ pub fn get_scene2() -> Scene {
     let p4 = Point {
         x: 10.0,
         y: 10.0,
-        z: 0.0,
+        z: 10.0,
     };
     let p5 = Point {
         x: 10.0,
@@ -40,7 +43,7 @@ pub fn get_scene2() -> Scene {
     let p6 = Point {
         x: -10.0,
         y: 10.0,
-        z: 0.0,
+        z: 10.0,
     };
     let p7 = Point {
         x: -10.0,
@@ -48,21 +51,32 @@ pub fn get_scene2() -> Scene {
         z: -10.0,
     };
 
-    // let left1 = Object::Triangle(Triangle::new(
-    //     p0,
-    //     p1,
-    //     p2,
-    //     [GREEN; 3],
-    //     Material::Diffuse,
-    // ));
-    // let left2 = Object::Triangle(Triangle::new(
-    //     p0,
-    //     p1,
-    //     p2,
-    //     [GREEN; 3],
-    //     Material::Diffuse,
-    // ));
-    
+    // Walls
+    let bottom1 = Object::Triangle(Triangle::new(p2, p1, p0, [BLUE; 3], Material::Diffuse));
+    let bottom2 = Object::Triangle(Triangle::new(p2, p3, p1, [BLUE; 3], Material::Diffuse));
+    let left1 = Object::Triangle(Triangle::new(p0, p1, p6, [RED; 3], Material::Diffuse));
+    let left2 = Object::Triangle(Triangle::new(p7, p6, p1, [RED; 3], Material::Diffuse));
+    let back1 = Object::Triangle(Triangle::new(p7, p1, p3, [GREEN; 3], Material::Diffuse));
+    let back2 = Object::Triangle(Triangle::new(p3, p5, p7, [GREEN; 3], Material::Diffuse));
+    let right1 = Object::Triangle(Triangle::new(p5, p3, p4, [WHITE; 3], Material::Diffuse));
+    let right2 = Object::Triangle(Triangle::new(p3, p2, p4, [WHITE; 3], Material::Diffuse));
+    let top1 = Object::Triangle(Triangle::new(p6, p7, p4, [PURPLE; 3], Material::Diffuse));
+    let top2 = Object::Triangle(Triangle::new(p7, p5, p4, [PURPLE; 3], Material::Diffuse));
+    let front1 = Object::Triangle(Triangle::new(
+        p6,
+        p2,
+        p0,
+        [RED, GREEN, BLUE],
+        Material::Diffuse,
+    ));
+    let front2 = Object::Triangle(Triangle::new(
+        p6,
+        p4,
+        p2,
+        [RED, GREEN, BLUE],
+        Material::Diffuse,
+    ));
+
     let sphere0 = Object::Sphere(Sphere {
         centre: p0,
         radius: 1.0,
@@ -111,9 +125,68 @@ pub fn get_scene2() -> Scene {
         colour: GREEN,
         material: Material::Diffuse,
     });
-    Scene {
-        objects: vec![sphere0, sphere1, sphere2, sphere3, sphere4, sphere5, sphere6, sphere7],
-    }
+
+    // Ornaments
+    let p_centre = Point {
+        x: 0.0,
+        y: 0.0,
+        z: -5.0,
+    };
+    let sphere_centre = Object::Sphere(Sphere {
+        centre: p_centre,
+        radius: 1.0,
+        colour: BLUE,
+        material: Material::Diffuse,
+    });
+    let p_mid_centre = Point {
+        x: -5.0,
+        y: -5.0,
+        z: -1.0,
+    };
+    let sphere_mid_centre = Object::Sphere(Sphere {
+        centre: p_mid_centre,
+        radius: 2.0,
+        colour: PURPLE,
+        material: Material::Diffuse,
+    });
+    let p_back_centre = Point {
+        x: 7.0,
+        y: -7.0,
+        z: -7.0,
+    };
+    let sphere_back_centre = Object::Sphere(Sphere {
+        centre: p_back_centre,
+        radius: 2.0,
+        colour: RED,
+        material: Material::Diffuse,
+    });
+
+    let objects = vec![
+        sphere0,
+        sphere1,
+        sphere2,
+        sphere3,
+        sphere4,
+        sphere5,
+        sphere6,
+        sphere7,
+        bottom1,
+        bottom2,
+        left1,
+        left2,
+        back1,
+        back2,
+        right1,
+        right2,
+        top1,
+        top2,
+        sphere_centre,
+        sphere_mid_centre,
+        sphere_back_centre,
+        front1,
+        front2,
+    ];
+    Scene { objects }
 }
 
 pub fn get_scene() -> Scene {

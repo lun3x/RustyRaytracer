@@ -1,9 +1,8 @@
 use crate::objects::*;
 use crate::rays::*;
+use crate::utils;
 use crate::visualiser::*;
 use cgmath::prelude::*;
-
-const EPSILON: f32 = 0.000005;
 
 pub struct BarycentricCoords {
     pub u: f32,
@@ -59,7 +58,7 @@ impl Intersectable for Sphere {
         let radius_squared: f32 = self.radius * self.radius;
 
         // No intersect if opposite is greater than radius^2
-        if opposite_squared > radius_squared {
+        if utils::is_greater_than(opposite_squared, radius_squared) {
             return None;
         }
 
@@ -94,11 +93,11 @@ impl Intersectable for Triangle {
         let determinant: f32 = v0v1.dot(pvec);
 
         // cull backfacing triangles
-        if determinant < EPSILON {
+        if utils::is_negative(determinant) {
             return None;
         }
         // avoid parallel rays
-        if determinant.abs() < EPSILON {
+        if utils::is_zero(determinant) {
             return None;
         }
 
@@ -106,14 +105,14 @@ impl Intersectable for Triangle {
         let inv_det: f32 = 1.0 / determinant;
         let tvec: Vector = ray.start - self.v0;
         let u: f32 = tvec.dot(pvec) * inv_det;
-        if u < 0.0 || u > 1.0 {
+        if utils::is_negative(u) || utils::is_greater_than(u, 1.0) {
             return None;
         }
 
         // compute 'v' barycentric coord
         let qvec: Vector = tvec.cross(v0v1);
         let v: f32 = ray.dir.dot(qvec) * inv_det;
-        if v < 0.0 || u + v > 1.0 {
+        if utils::is_negative(v) || utils::is_greater_than(u + v, 1.0) {
             return None;
         }
 
