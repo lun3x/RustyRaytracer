@@ -2,11 +2,11 @@ use crate::objects::*;
 use crate::scene::*;
 use crate::visualiser::*;
 
-const RED: [u8; 3] = [255, 0, 0];
-const GREEN: [u8; 3] = [0, 255, 0];
-const BLUE: [u8; 3] = [0, 0, 255];
-const WHITE: [u8; 3] = [255, 255, 255];
-const PURPLE: [u8; 3] = [255, 0, 255];
+const RED: ColourFloat = ColourFloat::new(255., 0., 0.);
+const GREEN: ColourFloat = ColourFloat::new(0., 255., 0.);
+const BLUE: ColourFloat = ColourFloat::new(0., 0., 255.);
+const WHITE: ColourFloat = ColourFloat::new(255., 255., 255.);
+const PURPLE: ColourFloat = ColourFloat::new(255., 0., 255.);
 
 pub fn get_scene2() -> Scene {
     // Vertices
@@ -52,12 +52,12 @@ pub fn get_scene2() -> Scene {
     };
 
     // Walls
-    let bottom1 = Object::Triangle(Triangle::new(p2, p1, p0, [BLUE; 3], Material::Diffuse));
+    let bottom1 = Object::Triangle(Triangle::new(p2, p1, p0, [GREEN; 3], Material::Diffuse));
     let bottom2 = Object::Triangle(Triangle::new(p2, p3, p1, [BLUE; 3], Material::Diffuse));
     let left1 = Object::Triangle(Triangle::new(p0, p1, p6, [RED; 3], Material::Diffuse));
     let left2 = Object::Triangle(Triangle::new(p7, p6, p1, [RED; 3], Material::Diffuse));
-    let back1 = Object::Triangle(Triangle::new(p7, p1, p3, [GREEN; 3], Material::Diffuse));
-    let back2 = Object::Triangle(Triangle::new(p3, p5, p7, [GREEN; 3], Material::Diffuse));
+    let back1 = Object::Triangle(Triangle::new(p7, p1, p3, [GREEN; 3], Material::Specular));
+    let back2 = Object::Triangle(Triangle::new(p3, p5, p7, [GREEN; 3], Material::Specular));
     let right1 = Object::Triangle(Triangle::new(p5, p3, p4, [WHITE; 3], Material::Diffuse));
     let right2 = Object::Triangle(Triangle::new(p3, p2, p4, [WHITE; 3], Material::Diffuse));
     let top1 = Object::Triangle(Triangle::new(p6, p7, p4, [PURPLE; 3], Material::Diffuse));
@@ -74,7 +74,7 @@ pub fn get_scene2() -> Scene {
         p4,
         p2,
         [RED, GREEN, BLUE],
-        Material::Diffuse,
+        Material::Specular,
     ));
 
     let sphere0 = Object::Sphere(Sphere {
@@ -136,7 +136,7 @@ pub fn get_scene2() -> Scene {
         centre: p_centre,
         radius: 1.0,
         colour: BLUE,
-        material: Material::Diffuse,
+        material: Material::Specular,
     });
     let p_mid_centre = Point {
         x: -5.0,
@@ -147,7 +147,7 @@ pub fn get_scene2() -> Scene {
         centre: p_mid_centre,
         radius: 2.0,
         colour: PURPLE,
-        material: Material::Diffuse,
+        material: Material::Specular,
     });
     let p_back_centre = Point {
         x: 7.0,
@@ -158,7 +158,7 @@ pub fn get_scene2() -> Scene {
         centre: p_back_centre,
         radius: 2.0,
         colour: RED,
-        material: Material::Diffuse,
+        material: Material::Specular,
     });
 
     let objects = vec![
@@ -189,63 +189,63 @@ pub fn get_scene2() -> Scene {
     Scene { objects }
 }
 
-pub fn get_scene() -> Scene {
-    let p1 = Point {
-        x: -4.0,
-        y: 2.0,
-        z: -13.0,
-    };
-    let p2 = Point {
-        x: -2.0,
-        y: -2.0,
-        z: -7.0,
-    };
-    let p3 = Point {
-        x: 2.0,
-        y: 0.0,
-        z: -11.0,
-    };
-    let sphere1 = Object::Sphere(Sphere {
-        centre: p1,
-        radius: 1.0,
-        colour: RED,
-        material: Material::Diffuse,
-    });
-    let sphere2 = Object::Sphere(Sphere {
-        centre: p2,
-        radius: 1.0,
-        colour: GREEN,
-        material: Material::Diffuse,
-    });
-    let sphere3 = Object::Sphere(Sphere {
-        centre: p3,
-        radius: 1.0,
-        colour: BLUE,
-        material: Material::Diffuse,
-    });
-    let v0 = Point {
-        x: p1.x,
-        y: p1.y,
-        z: p1.z + 2.0,
-    };
-    let v1 = Point {
-        x: p2.x,
-        y: p2.y,
-        z: p2.z + 2.0,
-    };
-    let v2 = Point {
-        x: p3.x,
-        y: p3.y,
-        z: p3.z + 2.0,
-    };
-    let triangle1 = Object::Triangle(Triangle::new(
-        p1,
-        p2,
-        p3,
-        [GREEN, BLUE, RED],
-        Material::Diffuse,
-    ));
-    Scene {
-        objects: vec![sphere1, sphere2, sphere3, triangle1],
-    }
-}
+// pub fn get_scene() -> Scene {
+//     let p1 = Point {
+//         x: -4.0,
+//         y: 2.0,
+//         z: -13.0,
+//     };
+//     let p2 = Point {
+//         x: -2.0,
+//         y: -2.0,
+//         z: -7.0,
+//     };
+//     let p3 = Point {
+//         x: 2.0,
+//         y: 0.0,
+//         z: -11.0,
+//     };
+//     let sphere1 = Object::Sphere(Sphere {
+//         centre: p1,
+//         radius: 1.0,
+//         colour: RED,
+//         material: Material::Diffuse,
+//     });
+//     let sphere2 = Object::Sphere(Sphere {
+//         centre: p2,
+//         radius: 1.0,
+//         colour: GREEN,
+//         material: Material::Diffuse,
+//     });
+//     let sphere3 = Object::Sphere(Sphere {
+//         centre: p3,
+//         radius: 1.0,
+//         colour: BLUE,
+//         material: Material::Diffuse,
+//     });
+//     let v0 = Point {
+//         x: p1.x,
+//         y: p1.y,
+//         z: p1.z + 2.0,
+//     };
+//     let v1 = Point {
+//         x: p2.x,
+//         y: p2.y,
+//         z: p2.z + 2.0,
+//     };
+//     let v2 = Point {
+//         x: p3.x,
+//         y: p3.y,
+//         z: p3.z + 2.0,
+//     };
+//     let triangle1 = Object::Triangle(Triangle::new(
+//         p1,
+//         p2,
+//         p3,
+//         [GREEN, BLUE, RED],
+//         Material::Diffuse,
+//     ));
+//     Scene {
+//         objects: vec![sphere1, sphere2, sphere3, triangle1],
+//     }
+// }

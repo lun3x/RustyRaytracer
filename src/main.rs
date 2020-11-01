@@ -17,7 +17,7 @@ fn main() {
         y: 0.0,
         z: 25.0,
     };
-    let camera = Camera::new(p0, 1.0,160.0);
+    let camera = Camera::new(p0, 1.0, 90.0);
 
     let mut visualiser = Visualiser::new(400, 400, camera);
 
@@ -27,7 +27,7 @@ fn main() {
     for y in 0..visualiser.screen.height() {
         for x in 0..visualiser.screen.width() {
             let cam_ray = visualiser.create_camera_ray(x, y);
-            visualiser.put_pixel(x, y, crate::rays::trace(cam_ray, &scene, 5));
+            visualiser.put_pixel(x, y, crate::objects::as_int(crate::rays::trace(cam_ray, &scene, 5)));
         }
     }
     let render_time = start_render.elapsed().as_millis();

@@ -5,6 +5,8 @@ use crate::utils;
 use crate::visualiser::*;
 use cgmath::prelude::*;
 
+const BACKGROUND: ColourFloat = ColourFloat::new(0.0, 0.0, 0.0);
+
 pub struct Ray {
     pub start: Point,
     pub dir: Vector,
@@ -26,7 +28,7 @@ impl Ray {
     }
 }
 
-pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> Colour {
+pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
     match scene.closest_intersection(&ray) {
         Some(i) => {
             let isect_position: Point = i.location.distance * ray.dir;
@@ -39,7 +41,7 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> Colour {
                             start: isect_position + (normal * 0.005),
                             dir: ray.reflect(&normal),
                         };
-                        trace(reflected_ray, scene, depth - 1)
+                        0.9 * trace(reflected_ray, scene, depth - 1)
                     } else {
                         i.object.get_colour(i.location.texture_coords)
                     }
@@ -47,6 +49,6 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> Colour {
                 Diffuse => i.object.get_colour(i.location.texture_coords),
             }
         }
-        _ => [0, 0, 0],
+        _ => BACKGROUND,
     }
 }
