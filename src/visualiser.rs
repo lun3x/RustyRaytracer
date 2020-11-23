@@ -18,8 +18,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(location: Point, focal_length: f32, yaw: f32) -> Self {
-        let yaw = cgmath::Deg(yaw);
+    pub fn new(location: Point, focal_length: f32, yaw: cgmath::Deg<f32>) -> Self {
         let rotation_matrix = RotationMatrix::from_angle_y(yaw);
         let location = utils::four_to_three(rotation_matrix * utils::three_to_four(location));
         Camera {
@@ -28,6 +27,11 @@ impl Camera {
             yaw,
             rotation_matrix,
         }
+    }
+
+    pub fn rotate(&self, yaw: f32) -> Self {
+        let yaw = cgmath::Deg(yaw);
+        Self::new(self.location, self.focal_length, self.yaw + yaw)
     }
 }
 
@@ -44,6 +48,10 @@ impl Visualiser {
             aspect_ratio: width as f32 / height as f32,
             camera,
         }
+    }
+
+    pub fn rotate(&mut self, yaw: f32) {
+        self.camera = self.camera.rotate(yaw);
     }
 
     pub fn create_camera_ray(&self, x: u32, y: u32) -> Ray {

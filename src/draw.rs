@@ -9,8 +9,9 @@ use winit_input_helper::WinitInputHelper;
 pub const SCREEN_HEIGHT: u32 = 400;
 pub const SCREEN_WIDTH: u32 = 400;
 
-pub fn render_scene(visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
+pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();
+    let mut input = WinitInputHelper::new();
     let (window, p_width, p_height) = create_window("RustyRaytracer", &event_loop);
     let surface_texture = SurfaceTexture::new(p_width, p_height, &window);
     let mut pixels = Pixels::new(SCREEN_WIDTH, SCREEN_HEIGHT, surface_texture)?;
@@ -27,6 +28,24 @@ pub fn render_scene(visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
             {
                 *control_flow = ControlFlow::Exit;
                 return;
+            }
+        }
+
+        if input.update(&event) {
+            // Close events
+            if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
+                *control_flow = ControlFlow::Exit;
+                return;
+            }
+            if input.key_pressed(VirtualKeyCode::Left) {
+                println!("LEFT");
+                visualiser.rotate(10.0);
+                window.request_redraw();
+            }
+            if input.key_pressed(VirtualKeyCode::Right) {
+                println!("RIGHT");
+                visualiser.rotate(-10.0);
+                window.request_redraw();
             }
         }
     });

@@ -26,7 +26,7 @@ fn main() {
         y: 0.0,
         z: 25.0,
     };
-    let camera = Camera::new(p0, 1.0, 90.0);
+    let camera = Camera::new(p0, 1.0, cgmath::Deg(90.0));
 
     let mut visualiser = Visualiser::new(SCREEN_HEIGHT, SCREEN_WIDTH, camera);
 
