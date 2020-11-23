@@ -9,3 +9,6 @@ edition = "2018"
 [dependencies]
 image = "0.23.6"
 cgmath = "0.17.0"
+winit = "0.23.0"
+winit_input_helper = "0.6.0"
+pixels = "0.2.0"

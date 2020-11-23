@@ -23,7 +23,13 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn new(v0: Point, v1: Point, v2: Point, colours: [ColourFloat; 3], material: Material) -> Self {
+    pub fn new(
+        v0: Point,
+        v1: Point,
+        v2: Point,
+        colours: [ColourFloat; 3],
+        material: Material,
+    ) -> Self {
         Triangle {
             v0,
             v1,
@@ -60,11 +66,15 @@ pub fn as_int(colour: ColourFloat) -> Colour {
     [colour[0] as u8, colour[1] as u8, colour[2] as u8]
 }
 
+pub fn as_int4(colour: ColourFloat) -> [u8; 4] {
+    [colour[0] as u8, colour[1] as u8, colour[2] as u8, 0xff]
+}
+
 impl Coloured for Triangle {
     fn get_colour(&self, texture_coords: BarycentricCoords) -> ColourFloat {
         texture_coords.u * self.colours[0]
-        + texture_coords.v * self.colours[1]
-        + texture_coords.w * self.colours[2]
+            + texture_coords.v * self.colours[1]
+            + texture_coords.w * self.colours[2]
     }
 }
 
