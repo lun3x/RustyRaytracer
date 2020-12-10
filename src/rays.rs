@@ -18,12 +18,12 @@ impl Ray {
     }
 
     pub fn rotate(&self, rotation_matrix: RotationMatrix) -> Self {
-        let dir4 = utils::three_to_four(self.dir);
+        let dir4 = utils::to_4(self.dir);
         let rotated_dir = rotation_matrix * dir4;
 
         Ray {
             start: self.start,
-            dir: utils::four_to_three(rotated_dir),
+            dir: utils::to_3(rotated_dir),
         }
     }
 }

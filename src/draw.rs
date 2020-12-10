@@ -30,21 +30,39 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
                 return;
             }
         }
-
+        
         if input.update(&event) {
             // Close events
             if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-            if input.key_pressed(VirtualKeyCode::Left) {
-                println!("LEFT");
-                visualiser.rotate(10.0);
-                window.request_redraw();
-            }
-            if input.key_pressed(VirtualKeyCode::Right) {
-                println!("RIGHT");
-                visualiser.rotate(-10.0);
+            let modified = {
+                if input.key_pressed(VirtualKeyCode::Left) {
+                    println!("Left");
+                    visualiser.rotate(10.0);
+                    true
+                }
+                else if input.key_pressed(VirtualKeyCode::Right) {
+                    println!("Right");
+                    visualiser.rotate(-10.0);
+                    true
+                }
+                else if input.key_pressed(VirtualKeyCode::Up) {
+                    println!("Forward");
+                    visualiser.dolly(1.0);
+                    true
+                }
+                else if input.key_pressed(VirtualKeyCode::Down) {
+                    println!("Backward");
+                    visualiser.dolly(-1.0);
+                    true
+                }
+                else {
+                    false
+                }
+            };
+            if modified {
                 window.request_redraw();
             }
         }

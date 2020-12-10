@@ -9,7 +9,6 @@ pub type Point = cgmath::Vector3<f32>;
 pub type Vector = cgmath::Vector3<f32>;
 pub type RotationMatrix = cgmath::Matrix4<f32>;
 pub type Degrees = cgmath::Deg<f32>;
-
 pub struct Camera {
     pub location: Point,
     pub focal_length: f32,
@@ -18,9 +17,10 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(location: Point, focal_length: f32, yaw: cgmath::Deg<f32>) -> Self {
+    pub fn new(location: Point, focal_length: f32, yaw: Degrees) -> Self {
         let rotation_matrix = RotationMatrix::from_angle_y(yaw);
-        let location = utils::four_to_three(rotation_matrix * utils::three_to_four(location));
+        let location = utils::to_3(rotation_matrix * utils::to_4(location));
+        println!("Create camera at {:?} rotated by {:?}", location, yaw);
         Camera {
             location,
             focal_length,
@@ -29,9 +29,18 @@ impl Camera {
         }
     }
 
-    pub fn rotate(&self, yaw: f32) -> Self {
-        let yaw = cgmath::Deg(yaw);
-        Self::new(self.location, self.focal_length, self.yaw + yaw)
+    fn rotate(&mut self, yaw: Degrees) {
+        println!("Rotate camera by {:?} from {:?} to {:?}", yaw, self.yaw, self.yaw + yaw);
+        self.yaw = (self.yaw + yaw) % cgmath::Deg(360.0);
+        self.rotation_matrix = RotationMatrix::from_angle_y(self.yaw);
+        let location_rotation = RotationMatrix::from_angle_y(yaw);
+        self.location = utils::to_3(location_rotation * utils::to_4(self.location));
+    }
+
+    fn dolly(&mut self, distance: f32) {
+        println!("Dolly camera in {}m", distance);
+        self.location.x += distance * self.yaw.sin();
+        self.location.z -= distance * self.yaw.cos();
     }
 }
 
@@ -51,7 +60,11 @@ impl Visualiser {
     }
 
     pub fn rotate(&mut self, yaw: f32) {
-        self.camera = self.camera.rotate(yaw);
+        self.camera.rotate(cgmath::Deg(yaw));
+    }
+
+    pub fn dolly(&mut self, distance: f32) {
+        self.camera.dolly(distance)
     }
 
     pub fn create_camera_ray(&self, x: u32, y: u32) -> Ray {

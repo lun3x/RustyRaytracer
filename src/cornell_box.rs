@@ -189,6 +189,77 @@ pub fn get_scene2() -> Scene {
     Scene { objects }
 }
 
+pub fn get_scene3() -> Scene {
+    // Vertices
+    let p0 = Point {
+        x: -10.0,
+        y: -10.0,
+        z: 10.0,
+    };
+    let p1 = Point {
+        x: -10.0,
+        y: -10.0,
+        z: -10.0,
+    };
+    let p2 = Point {
+        x: 10.0,
+        y: -10.0,
+        z: 10.0,
+    };
+    let p3 = Point {
+        x: 10.0,
+        y: -10.0,
+        z: -10.0,
+    };
+    let p4 = Point {
+        x: 10.0,
+        y: 10.0,
+        z: 10.0,
+    };
+    let p5 = Point {
+        x: 10.0,
+        y: 10.0,
+        z: -10.0,
+    };
+    let p6 = Point {
+        x: -10.0,
+        y: 10.0,
+        z: 10.0,
+    };
+    let p7 = Point {
+        x: -10.0,
+        y: 10.0,
+        z: -10.0,
+    };
+
+    // Walls
+    let bottom1 = Object::Triangle(Triangle::new(p2, p1, p0, [GREEN; 3], Material::Diffuse));
+    let bottom2 = Object::Triangle(Triangle::new(p2, p3, p1, [BLUE; 3], Material::Diffuse));
+    let left1 = Object::Triangle(Triangle::new(p0, p1, p6, [RED; 3], Material::Diffuse));
+    let left2 = Object::Triangle(Triangle::new(p7, p6, p1, [RED; 3], Material::Diffuse));
+    let back1 = Object::Triangle(Triangle::new(p7, p1, p3, [GREEN; 3], Material::Diffuse));
+    let back2 = Object::Triangle(Triangle::new(p3, p5, p7, [GREEN; 3], Material::Diffuse));
+    let right1 = Object::Triangle(Triangle::new(p5, p3, p4, [WHITE; 3], Material::Diffuse));
+    let right2 = Object::Triangle(Triangle::new(p3, p2, p4, [WHITE; 3], Material::Diffuse));
+    let top1 = Object::Triangle(Triangle::new(p6, p7, p4, [PURPLE; 3], Material::Diffuse));
+    let top2 = Object::Triangle(Triangle::new(p7, p5, p4, [PURPLE; 3], Material::Diffuse));
+    let front1 = Object::Triangle(Triangle::new(
+        p6,
+        p2,
+        p0,
+        [RED, GREEN, BLUE],
+        Material::Diffuse,
+    ));
+
+    let objects = vec![
+        back1,
+        back2,
+        bottom1,
+        bottom2,
+    ];
+    Scene { objects }
+}
+
 // pub fn get_scene() -> Scene {
 //     let p1 = Point {
 //         x: -4.0,
