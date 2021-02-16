@@ -10,7 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 pub const SCREEN_HEIGHT: u32 = 400;
 pub const SCREEN_WIDTH: u32 = 400;
-pub const ANTIALIAS_SAMPLES: u32 = 1;
+pub const ANTIALIAS_SAMPLES: u32 = 10;
 
 pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();
@@ -23,7 +23,7 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
         // The one and only event that winit_input_helper doesn't have for us...
         if let Event::RedrawRequested(_) = event {
             println!("REDRAW");
-            draw(&visualiser, &scene, pixels.get_frame());
+            draw(&mut visualiser, &scene, pixels.get_frame());
             if pixels
                 .render()
                 .map_err(|e| println!("pixels.render() failed: {}", e))
@@ -37,6 +37,7 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
         if input.update(&event) {
             // Close events
             if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
+                visualiser.save();
                 *control_flow = ControlFlow::Exit;
                 return;
             }
@@ -68,7 +69,7 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
     });
 }
 
-fn draw(visualiser: &Visualiser, scene: &Scene, screen: &mut [u8]) {
+fn draw(visualiser: &mut Visualiser, scene: &Scene, screen: &mut [u8]) {
     let mut rng = rand::thread_rng();
     for (idx, pix) in screen.chunks_exact_mut(4).enumerate() {
         let x = idx as u32 % SCREEN_WIDTH;
@@ -81,10 +82,12 @@ fn draw(visualiser: &Visualiser, scene: &Scene, screen: &mut [u8]) {
             colour_float += crate::rays::trace(cam_ray, &scene, 5);
         }
         colour_float /= ANTIALIAS_SAMPLES as f32;
+        // Draw to screen buffer
         let colour_rgba = crate::objects::as_int4(colour_float);
         pix.copy_from_slice(&colour_rgba);
-        // let colour_rgb= crate::objects::as_int(colour_float);
-        // visualiser.put_pixel(x, y, colour_rgb)
+        // Save to render image
+        let colour_rgb= crate::objects::as_int(colour_float);
+        visualiser.put_pixel(x, y, colour_rgb)
     }
 }
 
