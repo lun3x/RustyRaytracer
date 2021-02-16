@@ -251,12 +251,7 @@ pub fn get_scene3() -> Scene {
         Material::Diffuse,
     ));
 
-    let objects = vec![
-        back1,
-        back2,
-        bottom1,
-        bottom2,
-    ];
+    let objects = vec![back1, back2, bottom1, bottom2];
     Scene { objects }
 }
 

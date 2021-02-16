@@ -30,7 +30,7 @@ fn main() {
 
     let mut visualiser = Visualiser::new(SCREEN_HEIGHT, SCREEN_WIDTH, camera);
 
-    let scene = crate::cornell_box::get_scene3();
+    let scene = crate::cornell_box::get_scene2();
 
     let start_render = Instant::now();
 

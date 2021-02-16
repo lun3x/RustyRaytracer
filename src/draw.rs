@@ -1,6 +1,8 @@
-use crate::scene::Scene;
+use crate::{scene::Scene, visualiser::ColourFloat};
 use crate::visualiser::Visualiser;
+use cgmath::Vector3;
 use pixels::{Error, Pixels, SurfaceTexture};
+use rand::Rng;
 use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
@@ -8,6 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 pub const SCREEN_HEIGHT: u32 = 400;
 pub const SCREEN_WIDTH: u32 = 400;
+pub const ANTIALIAS_SAMPLES: u32 = 1;
 
 pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();
@@ -30,7 +33,7 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
                 return;
             }
         }
-        
+
         if input.update(&event) {
             // Close events
             if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
@@ -42,23 +45,19 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
                     println!("Left");
                     visualiser.rotate(10.0);
                     true
-                }
-                else if input.key_pressed(VirtualKeyCode::Right) {
+                } else if input.key_pressed(VirtualKeyCode::Right) {
                     println!("Right");
                     visualiser.rotate(-10.0);
                     true
-                }
-                else if input.key_pressed(VirtualKeyCode::Up) {
+                } else if input.key_pressed(VirtualKeyCode::Up) {
                     println!("Forward");
                     visualiser.dolly(1.0);
                     true
-                }
-                else if input.key_pressed(VirtualKeyCode::Down) {
+                } else if input.key_pressed(VirtualKeyCode::Down) {
                     println!("Backward");
                     visualiser.dolly(-1.0);
                     true
-                }
-                else {
+                } else {
                     false
                 }
             };
@@ -70,11 +69,18 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
 }
 
 fn draw(visualiser: &Visualiser, scene: &Scene, screen: &mut [u8]) {
+    let mut rng = rand::thread_rng();
     for (idx, pix) in screen.chunks_exact_mut(4).enumerate() {
         let x = idx as u32 % SCREEN_WIDTH;
         let y = idx as u32 / SCREEN_WIDTH;
-        let cam_ray = visualiser.create_camera_ray(x, y);
-        let colour_float = crate::rays::trace(cam_ray, &scene, 5);
+        let mut colour_float = ColourFloat::new(0.0, 0.0, 0.0);
+        for s in 0..ANTIALIAS_SAMPLES {
+            let xx = x as f32 + rng.gen::<f32>();
+            let yy = y as f32 + rng.gen::<f32>();
+            let cam_ray = visualiser.create_camera_ray(xx, yy);
+            colour_float += crate::rays::trace(cam_ray, &scene, 5);
+        }
+        colour_float /= ANTIALIAS_SAMPLES as f32;
         let colour_rgba = crate::objects::as_int4(colour_float);
         pix.copy_from_slice(&colour_rgba);
         // let colour_rgb= crate::objects::as_int(colour_float);

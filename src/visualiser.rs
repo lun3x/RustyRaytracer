@@ -30,7 +30,12 @@ impl Camera {
     }
 
     fn rotate(&mut self, yaw: Degrees) {
-        println!("Rotate camera by {:?} from {:?} to {:?}", yaw, self.yaw, self.yaw + yaw);
+        println!(
+            "Rotate camera by {:?} from {:?} to {:?}",
+            yaw,
+            self.yaw,
+            self.yaw + yaw
+        );
         self.yaw = (self.yaw + yaw) % cgmath::Deg(360.0);
         self.rotation_matrix = RotationMatrix::from_angle_y(self.yaw);
         let location_rotation = RotationMatrix::from_angle_y(yaw);
@@ -67,9 +72,9 @@ impl Visualiser {
         self.camera.dolly(distance)
     }
 
-    pub fn create_camera_ray(&self, x: u32, y: u32) -> Ray {
-        let x_screen = ((x as f32 + 0.5) / self.screen.width() as f32) * 2.0 - 1.0;
-        let y_screen = 1.0 - ((y as f32 + 0.5) / self.screen.height() as f32) * 2.0;
+    pub fn create_camera_ray(&self, x: f32, y: f32) -> Ray {
+        let x_screen = ((x + 0.5) / self.screen.width() as f32) * 2.0 - 1.0;
+        let y_screen = 1.0 - ((y + 0.5) / self.screen.height() as f32) * 2.0;
 
         Ray {
             start: self.camera.location,
