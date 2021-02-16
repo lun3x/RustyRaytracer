@@ -10,7 +10,7 @@ use winit_input_helper::WinitInputHelper;
 
 pub const SCREEN_HEIGHT: u32 = 400;
 pub const SCREEN_WIDTH: u32 = 400;
-pub const ANTIALIAS_SAMPLES: u32 = 10;
+pub const ANTIALIAS_SAMPLES: u32 = 1;
 
 pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();

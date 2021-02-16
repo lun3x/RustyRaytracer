@@ -6,6 +6,8 @@ mod rays;
 mod scene;
 mod utils;
 mod visualiser;
+#[cfg(test)]
+mod tests;
 
 use crate::draw::*;
 use crate::scene::Scene;
