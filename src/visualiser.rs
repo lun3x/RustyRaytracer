@@ -39,7 +39,7 @@ impl Camera {
 
     fn dolly(&mut self, distance: f32) {
         println!("Dolly camera in {}m", distance);
-        self.location.x += distance * self.yaw.sin();
+        self.location.x -= distance * self.yaw.sin();
         self.location.z -= distance * self.yaw.cos();
     }
 }
