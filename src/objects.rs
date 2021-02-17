@@ -6,6 +6,7 @@ use cgmath::prelude::*;
 pub enum Material {
     Specular,
     Diffuse,
+    Lambertian,
 }
 
 pub enum Object {

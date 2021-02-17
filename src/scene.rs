@@ -18,7 +18,7 @@ impl Scene {
                         closest_isect = Some(Intersection::new(location, object));
                     }
                 }
-                _ => (),
+                None => (),
             }
         }
         closest_isect

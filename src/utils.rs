@@ -1,4 +1,7 @@
 const EPSILON: f32 = 0.000005;
+use cgmath::InnerSpace;
+use rand::Rng;
+use crate::visualiser::Vector;
 
 // All functions optimistically return true
 pub fn is_eq(num1: f32, num2: f32) -> bool {
@@ -31,4 +34,22 @@ pub fn to_3(vec4: &cgmath::Vector4<f32>) -> cgmath::Vector3<f32> {
 
 pub fn to_4(vec3: &cgmath::Vector3<f32>) -> cgmath::Vector4<f32> {
     cgmath::Vector4::new(vec3.x, vec3.y, vec3.z, 1.0)
+}
+
+pub fn rand_f32() -> f32 {
+    rand::thread_rng().gen::<f32>()
+}
+
+pub fn rand_f32_range(min: f32, max: f32) -> f32 {
+    rand::thread_rng().gen_range(min..max)
+}
+
+pub fn rand_vector() -> Vector {
+    let mut rng = rand::thread_rng();
+    Vector::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>())
+}
+
+pub fn rand_vector_range(min: f32, max: f32) -> Vector {
+    let mut rng = rand::thread_rng();
+    Vector::new(rng.gen_range(min..max), rng.gen_range(min..max), rng.gen_range(min..max))
 }
