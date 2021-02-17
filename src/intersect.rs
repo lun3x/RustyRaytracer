@@ -12,7 +12,7 @@ pub struct BarycentricCoords {
 
 impl BarycentricCoords {
     pub fn new(u: f32, v: f32) -> Self {
-        BarycentricCoords {
+        Self {
             u,
             v,
             w: 1.0 - u - v,
@@ -20,9 +20,14 @@ impl BarycentricCoords {
     }
 }
 
+pub enum TextureCoords {
+    Barycentric(BarycentricCoords),
+    None,
+}
+
 pub struct IntersectionLocation {
     pub distance: f32,
-    pub texture_coords: BarycentricCoords,
+    pub texture_coords: TextureCoords,
 }
 
 pub struct Intersection<'a> {
@@ -75,7 +80,7 @@ impl Intersectable for Sphere {
 
         let loc = IntersectionLocation {
             distance: if isect0 < isect1 { isect0 } else { isect1 },
-            texture_coords: BarycentricCoords::new(0.0, 0.0),
+            texture_coords: TextureCoords::None,
         };
 
         Some(loc)
@@ -120,7 +125,7 @@ impl Intersectable for Triangle {
 
         let loc = IntersectionLocation {
             distance,
-            texture_coords: BarycentricCoords::new(u, v),
+            texture_coords: TextureCoords::Barycentric(BarycentricCoords::new(u, v)),
         };
 
         Some(loc)

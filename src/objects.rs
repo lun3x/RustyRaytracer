@@ -55,7 +55,7 @@ pub struct Sphere {
 }
 
 pub trait Coloured {
-    fn get_colour(&self, texture_coords: BarycentricCoords) -> ColourFloat;
+    fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat;
 }
 
 pub fn as_float(colour: Colour) -> ColourFloat {
@@ -71,21 +71,27 @@ pub fn as_int4(colour: ColourFloat) -> [u8; 4] {
 }
 
 impl Coloured for Triangle {
-    fn get_colour(&self, texture_coords: BarycentricCoords) -> ColourFloat {
-        texture_coords.u * self.colours[0]
-            + texture_coords.v * self.colours[1]
-            + texture_coords.w * self.colours[2]
+    fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat {
+        use TextureCoords::*;
+        match texture_coords {
+            Barycentric(coords) => coords.u * self.colours[0] + coords.v * self.colours[1] + coords.w * self.colours[2],
+            None => panic!("Incorrect texture coord type specified for triangle."),
+        }
     }
 }
 
 impl Coloured for Sphere {
-    fn get_colour(&self, _texture_coords: BarycentricCoords) -> ColourFloat {
-        self.colour
+    fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat {
+        use TextureCoords::*;
+        match texture_coords {
+            Barycentric(_) => panic!("Incorrect texture coord type specified for sphere."),
+            None => self.colour,
+        }
     }
 }
 
 impl Coloured for Object {
-    fn get_colour(&self, texture_coords: BarycentricCoords) -> ColourFloat {
+    fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat {
         use Object::*;
         match *self {
             Triangle(ref t) => t.get_colour(texture_coords),

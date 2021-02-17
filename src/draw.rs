@@ -1,5 +1,5 @@
-use crate::{scene::Scene, visualiser::ColourFloat};
 use crate::visualiser::Visualiser;
+use crate::{scene::Scene, visualiser::ColourFloat};
 use cgmath::Vector3;
 use pixels::{Error, Pixels, SurfaceTexture};
 use rand::Rng;
@@ -86,7 +86,7 @@ fn draw(visualiser: &mut Visualiser, scene: &Scene, screen: &mut [u8]) {
         let colour_rgba = crate::objects::as_int4(colour_float);
         pix.copy_from_slice(&colour_rgba);
         // Save to render image
-        let colour_rgb= crate::objects::as_int(colour_float);
+        let colour_rgb = crate::objects::as_int(colour_float);
         visualiser.put_pixel(x, y, colour_rgb)
     }
 }

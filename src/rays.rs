@@ -14,7 +14,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn reflect(&self, normal: &Vector) -> Vector {
-        self.dir - 2.0 * self.dir.dot(*normal) * normal
+        (self.dir - (2.0 * self.dir.dot(*normal) * normal)).normalize()
     }
 
     pub fn rotate(&self, rotation_matrix: RotationMatrix) -> Self {

@@ -4,10 +4,10 @@ mod intersect;
 mod objects;
 mod rays;
 mod scene;
-mod utils;
-mod visualiser;
 #[cfg(test)]
 mod tests;
+mod utils;
+mod visualiser;
 
 use crate::draw::*;
 use crate::scene::Scene;
