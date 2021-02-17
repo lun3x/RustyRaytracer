@@ -19,7 +19,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(location: Point, focal_length: f32, yaw: Degrees) -> Self {
         let rotation_matrix = RotationMatrix::from_angle_y(yaw);
-        let location = utils::to_3(rotation_matrix * utils::to_4(location));
+        let location = utils::to_3(&(rotation_matrix * utils::to_4(&location)));
         println!("Create camera at {:?} rotated by {:?}", location, yaw);
         Camera {
             location,
@@ -39,7 +39,7 @@ impl Camera {
         self.yaw = (self.yaw + yaw) % cgmath::Deg(360.0);
         self.rotation_matrix = RotationMatrix::from_angle_y(self.yaw);
         let location_rotation = RotationMatrix::from_angle_y(yaw);
-        self.location = utils::to_3(location_rotation * utils::to_4(self.location));
+        self.location = utils::to_3(&(location_rotation * utils::to_4(&self.location)));
     }
 
     fn dolly(&mut self, distance: f32) {
@@ -75,17 +75,16 @@ impl Visualiser {
     pub fn create_camera_ray(&self, x: f32, y: f32) -> Ray {
         let x_screen = ((x + 0.5) / self.screen.width() as f32) * 2.0 - 1.0;
         let y_screen = 1.0 - ((y + 0.5) / self.screen.height() as f32) * 2.0;
+        let ray_dir = Vector {
+            x: x_screen,
+            y: y_screen,
+            z: -self.camera.focal_length,
+        };
 
         Ray {
             start: self.camera.location,
-            dir: Vector {
-                x: x_screen,
-                y: y_screen,
-                z: -self.camera.focal_length,
-            }
-            .normalize(),
+            dir: rotate(&ray_dir, &self.camera.rotation_matrix).normalize(),
         }
-        .rotate(self.camera.rotation_matrix)
     }
 
     pub fn put_pixel(&mut self, x: u32, y: u32, colour: Colour) {

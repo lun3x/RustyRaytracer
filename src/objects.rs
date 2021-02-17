@@ -74,7 +74,9 @@ impl Coloured for Triangle {
     fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat {
         use TextureCoords::*;
         match texture_coords {
-            Barycentric(coords) => coords.u * self.colours[0] + coords.v * self.colours[1] + coords.w * self.colours[2],
+            Barycentric(coords) => {
+                coords.u * self.colours[0] + coords.v * self.colours[1] + coords.w * self.colours[2]
+            }
             None => panic!("Incorrect texture coord type specified for triangle."),
         }
     }

@@ -13,19 +13,19 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn reflect(&self, normal: &Vector) -> Vector {
-        (self.dir - (2.0 * self.dir.dot(*normal) * normal)).normalize()
+    pub fn new(start: Point, dir: Vector) -> Self {
+        Self { start, dir }
     }
+}
 
-    pub fn rotate(&self, rotation_matrix: RotationMatrix) -> Self {
-        let dir4 = utils::to_4(self.dir);
-        let rotated_dir = rotation_matrix * dir4;
+pub fn rotate(dir: &Vector, rotation_matrix: &RotationMatrix) -> Vector {
+    let dir4 = utils::to_4(dir);
+    let rotated_dir = rotation_matrix * dir4;
+    utils::to_3(&rotated_dir)
+}
 
-        Ray {
-            start: self.start,
-            dir: utils::to_3(rotated_dir),
-        }
-    }
+pub fn reflect(dir: &Vector, normal: &Vector) -> Vector {
+    (dir - (2.0 * dir.dot(*normal) * normal)).normalize()
 }
 
 pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
@@ -39,7 +39,7 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                         let normal = i.object.get_normal(isect_position);
                         let reflected_ray = Ray {
                             start: isect_position + (normal * 0.005),
-                            dir: ray.reflect(&normal),
+                            dir: reflect(&ray.dir, &normal),
                         };
                         0.9 * trace(reflected_ray, scene, depth - 1)
                     } else {
