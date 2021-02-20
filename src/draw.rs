@@ -1,7 +1,6 @@
-use crate::visualiser::Visualiser;
-use crate::{scene::Scene, visualiser::ColourFloat};
-use crate::utils::*;
-use cgmath::Vector3;
+use crate::raytracing::*;
+use crate::utils;
+
 use pixels::{Error, Pixels, SurfaceTexture};
 use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
 use winit::event::{Event, VirtualKeyCode};
@@ -75,17 +74,17 @@ fn draw(visualiser: &mut Visualiser, scene: &Scene, screen: &mut [u8]) {
         let y = idx as u32 / SCREEN_WIDTH;
         let mut colour_float = ColourFloat::new(0.0, 0.0, 0.0);
         for s in 0..ANTIALIAS_SAMPLES {
-            let xx = x as f32 + rand_f32();
-            let yy = y as f32 + rand_f32();
+            let xx = x as f32 + utils::rand_f32();
+            let yy = y as f32 + utils::rand_f32();
             let cam_ray = visualiser.create_camera_ray(xx, yy);
-            colour_float += crate::rays::trace(cam_ray, &scene, 5);
+            colour_float += trace(cam_ray, &scene, 5);
         }
         colour_float /= ANTIALIAS_SAMPLES as f32;
         // Draw to screen buffer
-        let colour_rgba = crate::objects::as_int4(colour_float);
+        let colour_rgba = as_int4(colour_float);
         pix.copy_from_slice(&colour_rgba);
         // Save to render image
-        let colour_rgb = crate::objects::as_int(colour_float);
+        let colour_rgb = as_int(colour_float);
         visualiser.put_pixel(x, y, colour_rgb)
     }
 }

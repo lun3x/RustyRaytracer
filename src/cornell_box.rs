@@ -1,6 +1,4 @@
-use crate::objects::*;
-use crate::scene::*;
-use crate::visualiser::*;
+use crate::raytracing::*;
 
 const RED: ColourFloat = ColourFloat::new(255., 0., 0.);
 const GREEN: ColourFloat = ColourFloat::new(0., 255., 0.);

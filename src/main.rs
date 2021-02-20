@@ -1,29 +1,18 @@
 mod cornell_box;
 mod draw;
-mod intersect;
-mod objects;
-mod rays;
-mod scene;
+mod raytracing;
 #[cfg(test)]
 mod tests;
 mod utils;
-mod visualiser;
 
 use crate::draw::*;
-use crate::scene::Scene;
-use crate::visualiser::*;
-use std::time::{Duration, Instant};
-
-use pixels::{Error, Pixels, SurfaceTexture};
-use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
-use winit::event::{Event, VirtualKeyCode};
-use winit::event_loop::{ControlFlow, EventLoop};
-use winit_input_helper::WinitInputHelper;
+use crate::raytracing::*;
+use std::time::Instant;
 
 fn main() {
     let start_load = Instant::now();
 
-    let p0 = Point {
+    let p0 = cgmath::Vector3 {
         x: 0.0,
         y: 0.0,
         z: 25.0,
