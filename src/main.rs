@@ -13,13 +13,12 @@ fn main() -> Result<(), Error> {
     let p0 = cgmath::Vector3 {
         x: 0.0,
         y: 0.0,
-        z: 25.0,
+        z: 0.0,
     };
-    let camera = Camera::new(p0, 1.0, cgmath::Deg(0.0));
+    let camera = Camera::new(p0, 1.0, ASPECT_RATIO, cgmath::Deg(0.0));
 
-    let visualiser = Visualiser::new(SCREEN_HEIGHT, SCREEN_WIDTH, camera);
+    let scene = crate::cornell_box::get_box();
+    let scene = crate::cornell_box::get_sphere();
 
-    let scene = crate::cornell_box::get_scene();
-
-    return draw::render_scene(visualiser, scene);
+    return draw::render_scene(camera, scene);
 }

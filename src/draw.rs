@@ -2,27 +2,32 @@ use crate::raytracing::*;
 use crate::utils;
 
 use pixels::{Error, Pixels, SurfaceTexture};
+use image::{Rgb, RgbImage};
 use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit_input_helper::WinitInputHelper;
 
-pub const SCREEN_HEIGHT: u32 = 400;
-pub const SCREEN_WIDTH: u32 = 400;
-pub const ANTIALIAS_SAMPLES: u32 = 1;
+pub const SCREEN_HEIGHT: u32 = 100;
+pub const SCREEN_WIDTH: u32 = SCREEN_HEIGHT * 16 / 9;
+pub const ASPECT_RATIO: f32 = SCREEN_WIDTH as f32 / SCREEN_HEIGHT as f32;
 
-pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Error> {
+pub const ANTIALIAS_SAMPLES: u32 = 1;
+pub const REFLECT_DEPTH: u32 = 5;
+
+pub fn render_scene(mut camera: Camera, scene: Scene) -> Result<(), Error> {
     let event_loop = EventLoop::new();
     let mut input = WinitInputHelper::new();
     let (window, p_width, p_height) = create_window("RustyRaytracer", &event_loop);
     let surface_texture = SurfaceTexture::new(p_width, p_height, &window);
     let mut pixels = Pixels::new(SCREEN_WIDTH, SCREEN_HEIGHT, surface_texture)?;
+    let mut image = RgbImage::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     event_loop.run(move |event, _, control_flow| {
         // The one and only event that winit_input_helper doesn't have for us...
         if let Event::RedrawRequested(_) = event {
             println!("REDRAW");
-            draw(&mut visualiser, &scene, pixels.get_frame());
+            draw(&camera, &scene, pixels.get_frame(), &mut image);
             if pixels
                 .render()
                 .map_err(|e| println!("pixels.render() failed: {}", e))
@@ -36,26 +41,26 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
         if input.update(&event) {
             // Close events
             if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
-                visualiser.save();
+                image.save("render.png");
                 *control_flow = ControlFlow::Exit;
                 return;
             }
             let modified = {
                 if input.key_pressed(VirtualKeyCode::Left) {
                     println!("Left");
-                    visualiser.rotate(10.0);
+                    camera.rotate(cgmath::Deg(10.0));
                     true
                 } else if input.key_pressed(VirtualKeyCode::Right) {
                     println!("Right");
-                    visualiser.rotate(-10.0);
+                    camera.rotate(cgmath::Deg(-10.0));
                     true
                 } else if input.key_pressed(VirtualKeyCode::Up) {
                     println!("Forward");
-                    visualiser.dolly(1.0);
+                    camera.dolly(1.0);
                     true
                 } else if input.key_pressed(VirtualKeyCode::Down) {
                     println!("Backward");
-                    visualiser.dolly(-1.0);
+                    camera.dolly(-1.0);
                     true
                 } else {
                     false
@@ -68,16 +73,20 @@ pub fn render_scene(mut visualiser: Visualiser, scene: Scene) -> Result<(), Erro
     });
 }
 
-fn draw(visualiser: &mut Visualiser, scene: &Scene, screen: &mut [u8]) {
+fn draw(camera: &Camera, scene: &Scene, screen: &mut [u8], image: &mut RgbImage) {
     for (idx, pix) in screen.chunks_exact_mut(4).enumerate() {
-        let x = idx as u32 % SCREEN_WIDTH;
-        let y = idx as u32 / SCREEN_WIDTH;
+        let u = idx as u32 % SCREEN_WIDTH;
+        let v = idx as u32 / SCREEN_WIDTH;
         let mut colour_float = ColourFloat::new(0.0, 0.0, 0.0);
-        for s in 0..ANTIALIAS_SAMPLES {
-            let xx = x as f32 + utils::rand_f32();
-            let yy = y as f32 + utils::rand_f32();
-            let cam_ray = visualiser.create_camera_ray(xx, yy);
-            colour_float += trace(cam_ray, &scene, 5);
+        for _ in 0..ANTIALIAS_SAMPLES {
+            let uu = u as f32 + utils::rand_f32();
+            let vv = v as f32 + utils::rand_f32();
+
+            let x = uu as f32 / (SCREEN_WIDTH - 1) as f32;
+            let y = vv as f32 / (SCREEN_HEIGHT - 1) as f32;
+
+            let cam_ray = camera.create_camera_ray(x, y);
+            colour_float += trace(cam_ray, &scene, REFLECT_DEPTH);
         }
         colour_float /= ANTIALIAS_SAMPLES as f32;
         // Draw to screen buffer
@@ -85,7 +94,7 @@ fn draw(visualiser: &mut Visualiser, scene: &Scene, screen: &mut [u8]) {
         pix.copy_from_slice(&colour_rgba);
         // Save to render image
         let colour_rgb = as_int(colour_float);
-        visualiser.put_pixel(x, y, colour_rgb)
+        image.put_pixel(u, v, Rgb(colour_rgb));
     }
 }
 

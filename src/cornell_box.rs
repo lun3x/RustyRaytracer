@@ -6,47 +6,63 @@ const BLUE: ColourFloat = ColourFloat::new(0., 0., 255.);
 const WHITE: ColourFloat = ColourFloat::new(255., 255., 255.);
 const PURPLE: ColourFloat = ColourFloat::new(255., 0., 255.);
 
-pub fn get_scene() -> Scene {
+pub fn get_sphere() -> Scene {
+    let p0 = Point {
+        x: 0.0,
+        y: 0.0,
+        z: 10.0 - 40.0,
+    };
+    let sphere0 = Object::Sphere(Sphere {
+        centre: p0,
+        radius: 1.0,
+        colour: RED,
+        material: Material::Diffuse,
+    });
+    let objects = vec![];
+    Scene { objects }
+}
+
+pub fn get_box() -> Scene {
     // Vertices
     let p0 = Point {
         x: -10.0,
         y: -10.0,
-        z: 10.0,
+        z: 10.0 - 20.0,
     };
     let p1 = Point {
         x: -10.0,
         y: -10.0,
-        z: -10.0,
+        z: -10.0 - 20.0,
     };
     let p2 = Point {
         x: 10.0,
         y: -10.0,
-        z: 10.0,
+        z: 10.0 - 20.0,
     };
     let p3 = Point {
         x: 10.0,
         y: -10.0,
-        z: -10.0,
+        z: -10.0 - 20.0,
     };
     let p4 = Point {
         x: 10.0,
         y: 10.0,
-        z: 10.0,
+        z: 10.0 - 20.0,
     };
     let p5 = Point {
         x: 10.0,
         y: 10.0,
-        z: -10.0,
+        z: -10.0 - 20.0,
     };
     let p6 = Point {
         x: -10.0,
         y: 10.0,
-        z: 10.0,
+        z: 10.0 - 20.0,
     };
     let p7 = Point {
         x: -10.0,
         y: 10.0,
-        z: -10.0,
+        z: -10.0 - 20.0,
     };
 
     // Walls

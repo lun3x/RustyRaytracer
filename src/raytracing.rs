@@ -1,3 +1,5 @@
+use std::collections::vec_deque;
+
 use cgmath::prelude::*;
 
 use crate::utils;
@@ -10,8 +12,8 @@ pub type Vector = cgmath::Vector3<f32>;
 pub type RotationMatrix = cgmath::Matrix4<f32>;
 pub type Degrees = cgmath::Deg<f32>;
 
-const BACKGROUND_TOP: ColourFloat = ColourFloat::new(1.0, 1.0, 1.0);
-const BACKGROUND_BOTTOM: ColourFloat = ColourFloat::new(0.5, 0.7, 1.0);
+const BACKGROUND_BOTTOM: ColourFloat = ColourFloat::new(255.0, 255.0, 255.0);
+const BACKGROUND_TOP: ColourFloat = ColourFloat::new(127.0, 178.0, 255.0);
 
 pub struct Scene {
     pub objects: Vec<Object>,
@@ -97,27 +99,54 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
     }
 }
 
+pub fn trace2(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
+    BACKGROUND_TOP
+}
+
 pub struct Camera {
-    pub location: Point,
-    pub focal_length: f32,
+    pub origin: Point,
+    pub horizontal_dir: Vector,
+    pub vertical_dir: Vector,
+    pub lower_left_corner: Vector,
     pub yaw: Degrees,
     pub rotation_matrix: RotationMatrix,
 }
 
 impl Camera {
-    pub fn new(location: Point, focal_length: f32, yaw: Degrees) -> Self {
+    pub fn new(origin: Point, focal_length: f32, aspect_ratio: f32, yaw: Degrees) -> Self {
         let rotation_matrix = RotationMatrix::from_angle_y(yaw);
-        let location = utils::to_3(&(rotation_matrix * utils::to_4(&location)));
-        println!("Create camera at {:?} rotated by {:?}", location, yaw);
+        let origin = utils::to_3(&(rotation_matrix * utils::to_4(&origin)));
+
+        let viewport_height = 2.0;
+        let viewport_width = aspect_ratio * viewport_height;
+        
+        let horizontal_dir = Vector::new(viewport_width, 0.0, 0.0);
+        let vertical_dir = Vector::new(0.0, viewport_height, 0.0);
+        let lower_left_corner = origin - horizontal_dir/2.0 - vertical_dir/2.0 - Vector::new(0.0, 0.0, focal_length);
+
+        println!("Create camera at {:?} rotated by {:?}", origin, yaw);
+
         Camera {
-            location,
-            focal_length,
+            origin,
+            horizontal_dir,
+            vertical_dir,
+            lower_left_corner,
             yaw,
             rotation_matrix,
         }
     }
 
-    fn rotate(&mut self, yaw: Degrees) {
+
+    pub fn create_camera_ray(&self, u: f32, v: f32) -> Ray {
+        let ray_dir = self.lower_left_corner + u*self.horizontal_dir + v*self.vertical_dir - self.origin;
+
+        Ray {
+            start: self.origin,
+            dir: rotate(&ray_dir, &self.rotation_matrix),
+        }
+    }
+
+    pub fn rotate(&mut self, yaw: Degrees) {
         println!(
             "Rotate camera by {:?} from {:?} to {:?}",
             yaw,
@@ -127,64 +156,13 @@ impl Camera {
         self.yaw = (self.yaw + yaw) % cgmath::Deg(360.0);
         self.rotation_matrix = RotationMatrix::from_angle_y(self.yaw);
         let location_rotation = RotationMatrix::from_angle_y(yaw);
-        self.location = utils::to_3(&(location_rotation * utils::to_4(&self.location)));
-    }
-
-    fn dolly(&mut self, distance: f32) {
-        println!("Dolly camera in {}m", distance);
-        self.location.x -= distance * self.yaw.sin();
-        self.location.z -= distance * self.yaw.cos();
-    }
-}
-
-pub struct Visualiser {
-    pub screen: RgbImage,
-    pub aspect_ratio: f32,
-    pub camera: Camera,
-}
-
-impl Visualiser {
-    pub fn new(height: u32, width: u32, camera: Camera) -> Self {
-        Visualiser {
-            screen: RgbImage::new(width, height),
-            aspect_ratio: width as f32 / height as f32,
-            camera,
-        }
-    }
-
-    pub fn rotate(&mut self, yaw: f32) {
-        self.camera.rotate(cgmath::Deg(yaw));
+        self.origin = utils::to_3(&(location_rotation * utils::to_4(&self.origin)));
     }
 
     pub fn dolly(&mut self, distance: f32) {
-        self.camera.dolly(distance)
-    }
-
-    pub fn create_camera_ray(&self, x: f32, y: f32) -> Ray {
-        let x_screen = ((x + 0.5) / self.screen.width() as f32) * 2.0 - 1.0;
-        let y_screen = 1.0 - ((y + 0.5) / self.screen.height() as f32) * 2.0;
-        let ray_dir = Vector {
-            x: x_screen,
-            y: y_screen,
-            z: -self.camera.focal_length,
-        };
-
-        Ray {
-            start: self.camera.location,
-            dir: rotate(&ray_dir, &self.camera.rotation_matrix).normalize(),
-        }
-    }
-
-    pub fn put_pixel(&mut self, x: u32, y: u32, colour: Colour) {
-        self.screen.put_pixel(x, y, Rgb(colour));
-    }
-
-    pub fn save(&self) {
-        let out_file = "render.png";
-        match self.screen.save(out_file) {
-            Ok(_) => println!("Saved {} successfully", out_file),
-            Err(_) => panic!("Problem saving {}!", out_file),
-        }
+        println!("Dolly camera in {}m", distance);
+        self.origin.x -= distance * self.yaw.sin();
+        self.origin.z -= distance * self.yaw.cos();
     }
 }
 
@@ -243,10 +221,6 @@ pub struct Sphere {
 
 pub trait Coloured {
     fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat;
-}
-
-pub fn as_float(colour: Colour) -> ColourFloat {
-    ColourFloat::new(colour[0] as f32, colour[1] as f32, colour[2] as f32)
 }
 
 pub fn as_int(colour: ColourFloat) -> Colour {
