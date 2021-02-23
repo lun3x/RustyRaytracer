@@ -115,7 +115,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(origin: Point, focal_length: f32, aspect_ratio: f32, yaw: Degrees) -> Self {
         let rotation_matrix = RotationMatrix::from_angle_y(yaw);
-        let origin = utils::to_3(&(rotation_matrix * utils::to_4(&origin)));
+        // let origin = utils::to_3(&(rotation_matrix * utils::to_4(&origin)));
 
         let viewport_height = 2.0;
         let viewport_width = aspect_ratio * viewport_height;
@@ -136,13 +136,12 @@ impl Camera {
         }
     }
 
-
     pub fn create_camera_ray(&self, u: f32, v: f32) -> Ray {
         let ray_dir = self.lower_left_corner + u*self.horizontal_dir + v*self.vertical_dir - self.origin;
 
         Ray {
             start: self.origin,
-            dir: rotate(&ray_dir, &self.rotation_matrix),
+            dir: ray_dir.normalize(),
         }
     }
 
@@ -160,7 +159,7 @@ impl Camera {
     }
 
     pub fn dolly(&mut self, distance: f32) {
-        println!("Dolly camera in {}m", distance);
+        println!("Dolly camera in {}m from ({:?}, {:?})", distance, self.origin.x, self.origin.z);
         self.origin.x -= distance * self.yaw.sin();
         self.origin.z -= distance * self.yaw.cos();
     }

@@ -18,7 +18,7 @@ pub fn get_sphere() -> Scene {
         colour: RED,
         material: Material::Diffuse,
     });
-    let objects = vec![];
+    let objects = vec![sphere0];
     Scene { objects }
 }
 
