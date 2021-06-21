@@ -1,152 +1,20 @@
 use crate::raytracing::*;
 use crate::utils;
+use crate::constants::*;
 
-use pixels::{Error, Pixels, SurfaceTexture};
-use image::{Rgb, RgbImage};
-use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
-use winit::event::{Event, VirtualKeyCode};
-use winit::event_loop::{ControlFlow, EventLoop};
-use winit_input_helper::WinitInputHelper;
+pub fn draw_to_screen(camera: &Camera, scene: &Scene, screen: &mut [u8]) {
+    for (idx, pix) in screen.chunks_exact_mut(3).enumerate() {
+        let u = idx as usize % SCREEN_WIDTH;
+        let v = idx as usize / SCREEN_WIDTH;
 
-pub const SCREEN_HEIGHT: u32 = 100;
-pub const SCREEN_WIDTH: u32 = SCREEN_HEIGHT * 16 / 9;
-pub const ASPECT_RATIO: f32 = SCREEN_WIDTH as f32 / SCREEN_HEIGHT as f32;
+        let x = u as f32 / (SCREEN_WIDTH - 1) as f32;
+        let y = v as f32 / (SCREEN_HEIGHT - 1) as f32;
 
-pub const ANTIALIAS_SAMPLES: u32 = 1;
-pub const REFLECT_DEPTH: u32 = 5;
+        let cam_ray = camera.create_camera_ray(x, y);
+        let colour_float = trace(cam_ray, &scene, REFLECT_DEPTH);
 
-pub fn render_scene(mut camera: Camera, scene: Scene) -> Result<(), Error> {
-    let event_loop = EventLoop::new();
-    let mut input = WinitInputHelper::new();
-    let (window, p_width, p_height) = create_window("RustyRaytracer", &event_loop);
-    let surface_texture = SurfaceTexture::new(p_width, p_height, &window);
-    let mut pixels = Pixels::new(SCREEN_WIDTH, SCREEN_HEIGHT, surface_texture)?;
-    let mut image = RgbImage::new(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    event_loop.run(move |event, _, control_flow| {
-        // The one and only event that winit_input_helper doesn't have for us...
-        if let Event::RedrawRequested(_) = event {
-            println!("REDRAW");
-            draw(&camera, &scene, pixels.get_frame(), &mut image);
-            if pixels
-                .render()
-                .map_err(|e| println!("pixels.render() failed: {}", e))
-                .is_err()
-            {
-                *control_flow = ControlFlow::Exit;
-                return;
-            }
-        }
-
-        if input.update(&event) {
-            // Close events
-            if input.key_pressed(VirtualKeyCode::Escape) || input.quit() {
-                image.save("render.png");
-                *control_flow = ControlFlow::Exit;
-                return;
-            }
-            let modified = {
-                if input.key_pressed(VirtualKeyCode::Left) {
-                    println!("Left");
-                    camera.rotate(cgmath::Deg(10.0));
-                    true
-                } else if input.key_pressed(VirtualKeyCode::Right) {
-                    println!("Right");
-                    camera.rotate(cgmath::Deg(-10.0));
-                    true
-                } else if input.key_pressed(VirtualKeyCode::Up) {
-                    println!("Forward");
-                    camera.dolly(1.0);
-                    true
-                } else if input.key_pressed(VirtualKeyCode::Down) {
-                    println!("Backward");
-                    camera.dolly(-1.0);
-                    true
-                } else {
-                    false
-                }
-            };
-            if modified {
-                window.request_redraw();
-            }
-        }
-    });
-}
-
-fn draw(camera: &Camera, scene: &Scene, screen: &mut [u8], image: &mut RgbImage) {
-    for (idx, pix) in screen.chunks_exact_mut(4).enumerate() {
-        let u = idx as u32 % SCREEN_WIDTH;
-        let v = idx as u32 / SCREEN_WIDTH;
-        let mut colour_float = ColourFloat::new(0.0, 0.0, 0.0);
-        for _ in 0..ANTIALIAS_SAMPLES {
-            let uu = u as f32 + utils::rand_f32();
-            let vv = v as f32 + utils::rand_f32();
-
-            let x = uu as f32 / (SCREEN_WIDTH - 1) as f32;
-            let y = vv as f32 / (SCREEN_HEIGHT - 1) as f32;
-
-            let cam_ray = camera.create_camera_ray(x, y);
-            colour_float += trace(cam_ray, &scene, REFLECT_DEPTH);
-        }
-        colour_float /= ANTIALIAS_SAMPLES as f32;
         // Draw to screen buffer
-        let colour_rgba = as_int4(colour_float);
-        pix.copy_from_slice(&colour_rgba);
-        // Save to render image
         let colour_rgb = as_int(colour_float);
-        image.put_pixel(u, v, Rgb(colour_rgb));
+        pix.copy_from_slice(&colour_rgb);
     }
-}
-
-/// Create a window for the game.
-///
-/// Automatically scales the window to cover about 2/3 of the monitor height.
-///
-/// # Returns
-///
-/// Tuple of `(window, surface, width, height, hidpi_factor)`
-/// `width` and `height` are in `PhysicalSize` units.
-fn create_window(title: &str, event_loop: &EventLoop<()>) -> (winit::window::Window, u32, u32) {
-    // Create a hidden window so we can estimate a good default window size
-    let window = winit::window::WindowBuilder::new()
-        .with_visible(false)
-        .with_title(title)
-        .build(&event_loop)
-        .unwrap();
-    let hidpi_factor = window.scale_factor();
-
-    // Get dimensions
-    let width = SCREEN_WIDTH as f64;
-    let height = SCREEN_HEIGHT as f64;
-    let (monitor_width, monitor_height) = {
-        match window.current_monitor() {
-            Some(monitor) => (
-                monitor.size().width as f64 / hidpi_factor,
-                monitor.size().height as f64 / hidpi_factor,
-            ),
-            None => (width, height),
-        }
-    };
-    let scale = (monitor_height / height * 2.0 / 3.0).round();
-
-    // Resize, center, and display the window
-    let min_size: winit::dpi::LogicalSize<f64> =
-        PhysicalSize::new(width, height).to_logical(hidpi_factor);
-    let default_size = LogicalSize::new(width * scale, height * scale);
-    let center = LogicalPosition::new(
-        (monitor_width - width * scale) / 2.0,
-        (monitor_height - height * scale) / 2.0,
-    );
-    window.set_inner_size(default_size);
-    window.set_min_inner_size(Some(min_size));
-    window.set_outer_position(center);
-    window.set_visible(true);
-
-    let size = default_size.to_physical::<f64>(hidpi_factor);
-
-    (
-        window,
-        size.width.round() as u32,
-        size.height.round() as u32,
-    )
 }

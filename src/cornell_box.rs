@@ -1,16 +1,11 @@
 use crate::raytracing::*;
-
-const RED: ColourFloat = ColourFloat::new(255., 0., 0.);
-const GREEN: ColourFloat = ColourFloat::new(0., 255., 0.);
-const BLUE: ColourFloat = ColourFloat::new(0., 0., 255.);
-const WHITE: ColourFloat = ColourFloat::new(255., 255., 255.);
-const PURPLE: ColourFloat = ColourFloat::new(255., 0., 255.);
+use crate::constants::*;
 
 pub fn get_sphere() -> Scene {
     let p0 = Point {
         x: 0.0,
         y: 0.0,
-        z: 10.0 - 40.0,
+        z: 10.0 - 15.0,
     };
     let sphere0 = Object::Sphere(Sphere {
         centre: p0,

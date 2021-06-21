@@ -1,5 +1,5 @@
-use crate::raytracing::*;
 use rand::Rng;
+use crate::constants::*;
 
 const EPSILON: f32 = 0.000005;
 

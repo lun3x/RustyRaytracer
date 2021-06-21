@@ -3,13 +3,14 @@ mod draw;
 mod raytracing;
 #[cfg(test)]
 mod tests;
+mod constants;
 mod utils;
+mod output;
 
-use crate::draw::*;
 use crate::raytracing::*;
-use pixels::Error;
+use crate::constants::*;
 
-fn main() -> Result<(), Error> {
+fn main() {
     let p0 = cgmath::Vector3 {
         x: 0.0,
         y: 0.0,
@@ -20,5 +21,9 @@ fn main() -> Result<(), Error> {
     let scene = crate::cornell_box::get_box();
     let scene = crate::cornell_box::get_sphere();
 
-    return draw::render_scene(camera, scene);
+    let mut screen: [u8; 3 * SCREEN_HEIGHT* SCREEN_WIDTH] = [0; 3 * SCREEN_HEIGHT* SCREEN_WIDTH];
+
+    draw::draw_to_screen(&camera, &scene, &mut screen);
+
+    output::write_to_ppm_file(&screen);
 }

@@ -3,7 +3,7 @@ Based on Scratchapixel's computer graphics guides. Rewritten in Rust.
 
 
 ## Image rendered from latest commit
-![Latest rendered image](render.png)
+![Latest rendered image](render.ppm)
 
 ## Features
 * Object types

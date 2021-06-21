@@ -1,19 +1,7 @@
-use std::collections::vec_deque;
-
 use cgmath::prelude::*;
 
 use crate::utils;
-use image::{Rgb, RgbImage};
-
-pub type Colour = [u8; 3];
-pub type ColourFloat = cgmath::Vector3<f32>;
-pub type Point = cgmath::Vector3<f32>;
-pub type Vector = cgmath::Vector3<f32>;
-pub type RotationMatrix = cgmath::Matrix4<f32>;
-pub type Degrees = cgmath::Deg<f32>;
-
-const BACKGROUND_BOTTOM: ColourFloat = ColourFloat::new(255.0, 255.0, 255.0);
-const BACKGROUND_TOP: ColourFloat = ColourFloat::new(127.0, 178.0, 255.0);
+use crate::constants::*;
 
 pub struct Scene {
     pub objects: Vec<Object>,
@@ -95,12 +83,8 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                 }
             }
         }
-        None => ((1.0 - ray.dir.y) * BACKGROUND_TOP) + (ray.dir.y * BACKGROUND_BOTTOM),
+        None => ColourFloat::zero(),
     }
-}
-
-pub fn trace2(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
-    BACKGROUND_TOP
 }
 
 pub struct Camera {
@@ -224,10 +208,6 @@ pub trait Coloured {
 
 pub fn as_int(colour: ColourFloat) -> Colour {
     [colour[0] as u8, colour[1] as u8, colour[2] as u8]
-}
-
-pub fn as_int4(colour: ColourFloat) -> [u8; 4] {
-    [colour[0] as u8, colour[1] as u8, colour[2] as u8, 0xff]
 }
 
 impl Coloured for Triangle {
