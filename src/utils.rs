@@ -62,3 +62,32 @@ pub fn rand_vector_range(min: f32, max: f32) -> Vector {
         rng.gen_range(min..max),
     )
 }
+
+pub fn clamp(val: f32, min: f32, max: f32) -> f32 {
+    if val < min {
+        return min;
+    }
+    if val > max {
+        return max;
+    }
+    return val;
+}
+
+pub fn clamp_colour(colour: ColourFloat) -> ColourFloat {
+    ColourFloat::new(
+        clamp(colour[0], 0.0, 0.999),
+        clamp(colour[1], 0.0, 0.999),
+        clamp(colour[2], 0.0, 0.999))
+}
+
+pub fn as_int(colour: ColourFloat) -> Colour {
+    [colour[0] as u8, colour[1] as u8, colour[2] as u8]
+}
+
+pub fn gamma_correct(colour: ColourFloat) -> ColourFloat {
+    ColourFloat::new(colour[0].sqrt(), colour[1].sqrt(), colour[2].sqrt())
+}
+
+pub fn correct_for_output(colour: ColourFloat) -> Colour {
+    as_int(256.0 * clamp_colour(gamma_correct(colour)))
+}

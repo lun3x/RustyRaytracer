@@ -14,7 +14,7 @@ pub fn draw_to_screen(camera: &Camera, scene: &Scene, screen: &mut [u8]) {
         let colour_float = trace(cam_ray, &scene, REFLECT_DEPTH);
 
         // Draw to screen buffer
-        let colour_rgb = as_int(colour_float);
+        let colour_rgb = utils::correct_for_output(colour_float);
         pix.copy_from_slice(&colour_rgb);
     }
 }
