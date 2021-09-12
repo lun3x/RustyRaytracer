@@ -83,7 +83,7 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                 }
             }
         }
-        None => ColourFloat::zero(),
+        None => BLUE.lerp(WHITE, 0.5*(ray.dir.y+1.0)),
     }
 }
 

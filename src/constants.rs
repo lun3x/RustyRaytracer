@@ -1,4 +1,4 @@
-pub const SCREEN_HEIGHT: usize = 100;
+pub const SCREEN_HEIGHT: usize = 200;
 pub const SCREEN_WIDTH: usize = SCREEN_HEIGHT * 16 / 9;
 pub const ASPECT_RATIO: f32 = SCREEN_WIDTH as f32 / SCREEN_HEIGHT as f32;
 

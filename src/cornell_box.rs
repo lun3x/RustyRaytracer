@@ -5,7 +5,7 @@ pub fn get_sphere() -> Scene {
     let p0 = Point {
         x: 0.0,
         y: 0.0,
-        z: 10.0 - 15.0,
+        z: -5.0,
     };
     let sphere0 = Object::Sphere(Sphere {
         centre: p0,
@@ -13,7 +13,18 @@ pub fn get_sphere() -> Scene {
         colour: RED,
         material: Material::Diffuse,
     });
-    let objects = vec![sphere0];
+    let p1 = Point {
+        x: 1.0,
+        y: 0.0,
+        z: -5.0,
+    };
+    let sphere1 = Object::Sphere(Sphere {
+        centre: p1,
+        radius: 1.0,
+        colour: GREEN,
+        material: Material::Diffuse,
+    });
+    let objects = vec![sphere0, sphere1];
     Scene { objects }
 }
 
