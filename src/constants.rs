@@ -1,4 +1,4 @@
-pub const SCREEN_HEIGHT: usize = 200;
+pub const SCREEN_HEIGHT: usize = 700;
 pub const SCREEN_WIDTH: usize = SCREEN_HEIGHT * 16 / 9;
 pub const ASPECT_RATIO: f32 = SCREEN_WIDTH as f32 / SCREEN_HEIGHT as f32;
 
@@ -19,3 +19,4 @@ pub const GREEN: ColourFloat = ColourFloat::new(0., 255., 0.);
 pub const BLUE: ColourFloat = ColourFloat::new(0., 0., 255.);
 pub const WHITE: ColourFloat = ColourFloat::new(255., 255., 255.);
 pub const PURPLE: ColourFloat = ColourFloat::new(255., 0., 255.);
+pub const BLACK: ColourFloat = ColourFloat::new(0., 0., 0.);

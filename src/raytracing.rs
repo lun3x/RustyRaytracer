@@ -78,12 +78,12 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                         };
                         0.5 * trace(diffuse_ray, scene, depth - 1)
                     } else {
-                        ColourFloat::zero()
+                        BLACK
                     }
                 }
             }
         }
-        None => BLUE.lerp(WHITE, 0.5*(ray.dir.y+1.0)),
+        None => BACKGROUND_TOP.lerp(BACKGROUND_BOTTOM, 0.5*(ray.dir.y+1.0)),
     }
 }
 

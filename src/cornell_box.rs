@@ -5,35 +5,35 @@ pub fn get_sphere() -> Scene {
     let p0 = Point {
         x: -1.0,
         y: 0.0,
-        z: -5.0,
+        z: -3.0,
     };
     let sphere0 = Object::Sphere(Sphere {
         centre: p0,
         radius: 1.0,
         colour: RED,
-        material: Material::Diffuse,
+        material: Material::Lambertian,
     });
     let p1 = Point {
         x: 1.0,
         y: 0.0,
-        z: -5.0,
+        z: -3.0,
     };
     let sphere1 = Object::Sphere(Sphere {
         centre: p1,
         radius: 1.0,
         colour: PURPLE,
-        material: Material::Diffuse,
+        material: Material::Lambertian,
     });
     let p2 = Point {
         x: 0.0,
         y: 101.0,
-        z: -5.0,
+        z: -3.0,
     };
     let sphere2 = Object::Sphere(Sphere {
         centre: p2,
         radius: 100.0,
         colour: GREEN,
-        material: Material::Diffuse,
+        material: Material::Lambertian,
     });
     let objects = vec![sphere0, sphere1, sphere2];
     Scene { objects }
