@@ -3,7 +3,7 @@ use crate::constants::*;
 
 pub fn get_sphere() -> Scene {
     let p0 = Point {
-        x: 0.0,
+        x: -1.0,
         y: 0.0,
         z: -5.0,
     };
@@ -21,10 +21,21 @@ pub fn get_sphere() -> Scene {
     let sphere1 = Object::Sphere(Sphere {
         centre: p1,
         radius: 1.0,
+        colour: PURPLE,
+        material: Material::Diffuse,
+    });
+    let p2 = Point {
+        x: 0.0,
+        y: 101.0,
+        z: -5.0,
+    };
+    let sphere2 = Object::Sphere(Sphere {
+        centre: p2,
+        radius: 100.0,
         colour: GREEN,
         material: Material::Diffuse,
     });
-    let objects = vec![sphere0, sphere1];
+    let objects = vec![sphere0, sphere1, sphere2];
     Scene { objects }
 }
 
