@@ -1,4 +1,6 @@
-use super::*;
+use super::raytracing::*;
+use super::constants::*;
+
 #[test]
 fn test_reflect_straight() {
     // Straight on
