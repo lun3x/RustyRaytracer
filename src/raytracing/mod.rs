@@ -41,13 +41,17 @@ pub fn reflect(dir: &Vector, normal: &Vector) -> Vector {
     (dir - (2.0 * dir.dot(*normal) * normal)).normalize()
 }
 
-pub fn diffuse(normal: &Vector) -> Vector {
+pub fn rand_in_unit_sphere() -> Vector {
     loop {
         let p = utils::rand_vector_range(-1.0, 1.0);
         if p.magnitude2() < 1.0 {
-            return (normal + p).normalize();
+            return p;
         }
     }
+}
+
+pub fn random_unit_vector() -> Vector {
+    rand_in_unit_sphere().normalize()
 }
 
 pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
@@ -73,8 +77,8 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                     if depth > 0 {
                         let normal = i.object.get_normal(isect_position);
                         let diffuse_ray = Ray {
-                            start: isect_position + (normal * 0.005),
-                            dir: diffuse(&normal),
+                            start: isect_position,
+                            dir: normal + random_unit_vector(),
                         };
                         0.5 * trace(diffuse_ray, scene, depth - 1)
                     } else {
