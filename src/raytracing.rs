@@ -206,10 +206,6 @@ pub trait Coloured {
     fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat;
 }
 
-pub fn as_int(colour: ColourFloat) -> Colour {
-    [colour[0] as u8, colour[1] as u8, colour[2] as u8]
-}
-
 impl Coloured for Triangle {
     fn get_colour(&self, texture_coords: TextureCoords) -> ColourFloat {
         use TextureCoords::*;
@@ -349,13 +345,19 @@ impl Intersectable for Sphere {
         let isect0 = adjacent - half_chord;
         let isect1 = adjacent + half_chord;
 
-        // Dont return intersections behind camera
+        // Don't return intersections behind camera
         if isect0.is_sign_negative() && isect1.is_sign_negative() {
             return None;
         }
 
+        // Avoid shadow acne
+        let distance = if isect0 < isect1 { isect0 } else { isect1 };
+        if distance < 0.001 {
+            return None;
+        }
+
         let loc = IntersectionLocation {
-            distance: if isect0 < isect1 { isect0 } else { isect1 },
+            distance,
             texture_coords: TextureCoords::None,
         };
 
