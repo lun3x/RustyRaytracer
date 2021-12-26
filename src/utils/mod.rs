@@ -1,12 +1,24 @@
+use std::ops::{Sub, Mul};
+
+use cgmath::InnerSpace;
 use rand::Rng;
 use crate::constants::*;
 
-const EPSILON: f32 = 0.000005;
+const EPSILON: f32 = 0.0005;
+
+pub fn hamming_distance(num1: Vector, num2: Vector) -> f32 {
+    (num1.x - num2.x).abs() +
+    (num1.y - num2.y).abs() +
+    (num1.z - num2.z).abs()
+}
 
 // All functions optimistically return true
-#[allow(dead_code)]
 pub fn is_eq(num1: f32, num2: f32) -> bool {
     (num1 - num2).abs() < EPSILON
+}
+
+pub fn is_eq_vec(vec1: Vector, vec2: Vector) -> bool {
+    hamming_distance(vec1, vec2) < EPSILON
 }
 
 pub fn is_zero(num1: f32) -> bool {

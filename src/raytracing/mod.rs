@@ -32,13 +32,19 @@ pub struct Ray {
 }
 
 pub fn rotate(dir: &Vector, rotation_matrix: &RotationMatrix) -> Vector {
+    assert!(utils::is_eq(dir.magnitude2(), 1.0));
+
     let dir4 = utils::to_4(dir);
     let rotated_dir = rotation_matrix * dir4;
     utils::to_3(&rotated_dir)
 }
 
 pub fn reflect(dir: &Vector, normal: &Vector) -> Vector {
-    (dir - (2.0 * dir.dot(*normal) * normal)).normalize()
+    // `normal` and `dir` must be normalised vectors
+    assert!(utils::is_eq(normal.magnitude2(), 1.0));
+    assert!(utils::is_eq(dir.magnitude2(), 1.0));
+
+    dir - (2.0 * dir.dot(*normal) * *normal)
 }
 
 pub fn rand_in_unit_sphere() -> Vector {
