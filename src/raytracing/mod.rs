@@ -83,8 +83,8 @@ pub fn trace(ray: Ray, scene: &Scene, depth: u32) -> ColourFloat {
                     if depth > 0 {
                         let normal = i.object.get_normal(isect_position);
                         let diffuse_ray = Ray {
-                            start: isect_position,
-                            dir: normal + random_unit_vector(),
+                            start: isect_position + (normal * 0.005),
+                            dir: normal + rand_in_unit_sphere(),
                         };
                         0.5 * trace(diffuse_ray, scene, depth - 1)
                     } else {
